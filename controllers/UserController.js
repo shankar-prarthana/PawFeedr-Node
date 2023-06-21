@@ -29,29 +29,29 @@ var sha512 = function (password, salt) {
     };
 };
 
-sendOTPSMS = async function (input){
-    const phoneNumber = "+91"+ input.mobile;
+sendOTPSMS = async function (input) {
+    const phoneNumber = "+91" + input.mobile;
     const mobile = input.mobile;
     const accountSid = 'ACe0a74a4f8fac5352c07ef03e229fe295';
     const authToken = 'ba10636447d8d7d564657e8a9f0acde9';
-    const from ='+14302435070'
+    const from = '+14302435070'
     const client = require('twilio')(accountSid, authToken);
     const notificationTypeCode = input.notificationTypeCode
     var op = input.operator_id
-   
-    
-   
+
+
+
     var notificationType = await RefNotificationTypesService.getByCode(notificationTypeCode);
     if (notificationType == null) {
         return res.status(200).send({ status: 403, message: 'notificationType error' });
     }
- 
-    var existingMobileOTP = await MobileOTPsService.getByMobileNotificationTypeId(mobile,notificationType._id);
+
+    var existingMobileOTP = await MobileOTPsService.getByMobileNotificationTypeId(mobile, notificationType._id);
 
     if (existingMobileOTP !== null) {
-        
-        console.log("existingMobileOTP: "+JSON.stringify(existingMobileOTP));
-         
+
+        console.log("existingMobileOTP: " + JSON.stringify(existingMobileOTP));
+
         await MobileOTPsService.expire(existingMobileOTP);
     }
     var newMobileOTP = {
@@ -62,15 +62,15 @@ sendOTPSMS = async function (input){
     console.log('newMobileOTP: ' + JSON.stringify(newMobileOTP));
     var newMobileOTP = await MobileOTPsService.create(newMobileOTP);
     console.log('newMobileOTP: ' + JSON.stringify(newMobileOTP));
-  
-   
-      var otpType = await RefOTPTypesService.getByCode("VALIDATION_OTP");
-      if (otpType == null) {
-          return res.status(200).send({ status: 403, message: 'otpType error' });
-      }
 
 
-  
+    var otpType = await RefOTPTypesService.getByCode("VALIDATION_OTP");
+    if (otpType == null) {
+        return res.status(200).send({ status: 403, message: 'otpType error' });
+    }
+
+
+
     var expiry = new Date(newMobileOTP.expiration_date);
     const options = {
         weekday: 'short',
@@ -79,25 +79,25 @@ sendOTPSMS = async function (input){
         day: 'numeric',
         hour: 'numeric',
         minute: 'numeric'
-      };
-      
-      expiry = expiry.toLocaleString('en-US', options);
+    };
+
+    expiry = expiry.toLocaleString('en-US', options);
 
     const message = notificationType.message
-    .replace("${otp}", newMobileOTP.otp)
-    .replace("${expiration_minutes}", otpType.expiration_interval)
-    .replace("${expiration_date}", expiry);
-  
-    console.log("MESSAGE: "+message);
+        .replace("${otp}", newMobileOTP.otp)
+        .replace("${expiration_minutes}", otpType.expiration_interval)
+        .replace("${expiration_date}", expiry);
+
+    console.log("MESSAGE: " + message);
     var newMobileMessage = {
-         message: message,
-         notfication_type_id: notificationType._id,
+        message: message,
+        notfication_type_id: notificationType._id,
         operator_id: op,
     };
     var newMobileMessage = await MobileMessagesService.create(newMobileMessage);
     console.log('newMobileMessage: ' + JSON.stringify(newMobileMessage));
 
-    
+
 
     // client.messages
     //     .create({
@@ -111,7 +111,7 @@ exports.validateMobileNumber = async function (req, res, next) {
     // console.log('In signupUser');
     console.log('req.body: ' + JSON.stringify(req.body));
     const mobile = parseInt(req.body.mobile)
-    if (mobile == null ) {
+    if (mobile == null) {
         //console.log("mobile:"+mobile+"email:"+req.body.email+"name:"+req.body.name+"pa    ssword:"+req.body.password);
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
@@ -125,7 +125,7 @@ exports.validateMobileNumber = async function (req, res, next) {
         mobile: mobile,
         notificationTypeCode: "SIGNUP_VALIDATION_OTP",
         operator_id: "validateMobileNumber",
-   };
+    };
     sendOTPSMS(input);
 
     return res.status(200).send({ status: "success", message: "OTP Sent Succesdully!" });
@@ -139,8 +139,8 @@ exports.verifyOTP = async function (req, res, next) {
     const mobile = parseInt(req.body.mobile)
 
     console.log('req.body: ' + JSON.stringify(req.body));
-    if (mobile == null || req.body.otp == null || req.body.notificationTypeCode == null ) {
-        console.log("mobile:"+mobile+"otp:"+req.body.otp);
+    if (mobile == null || req.body.otp == null || req.body.notificationTypeCode == null) {
+        console.log("mobile:" + mobile + "otp:" + req.body.otp);
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
     }
@@ -150,17 +150,17 @@ exports.verifyOTP = async function (req, res, next) {
     }
 
 
-    var mobileOtp = await MobileOTPsService.getByMobileNotificationTypeId(mobile,notificationType._id);
+    var mobileOtp = await MobileOTPsService.getByMobileNotificationTypeId(mobile, notificationType._id);
     if (mobileOtp == null) {
         return res.status(200).send({ status: 403, message: 'Resend OTP and try again' });
     }
 
-    if(mobileOtp.otp.toString !== req.body.otp.toString){
-      //  console.log('PRINT 1 '+(mobileOtp.otp!==req.body.otp.toString)+" mobileOtp: "+mobileOtp.otp+"req.body.otp: "+req.body.otp);
+    if (mobileOtp.otp.toString !== req.body.otp.toString) {
+        //  console.log('PRINT 1 '+(mobileOtp.otp!==req.body.otp.toString)+" mobileOtp: "+mobileOtp.otp+"req.body.otp: "+req.body.otp);
         return res.status(200).send({ status: 403, message: "OTP invalid enter correct OTP and try again" });
 
     }
-   
+
     await MobileOTPsService.expire(mobileOtp);
     return res.status(200).send({ status: "success", message: "Mobile validated Successfully" });
 
@@ -172,7 +172,7 @@ exports.resetPasswordValidation = async function (req, res, next) {
     // console.log('In sendValidationOTP');
     console.log('req.body: ' + JSON.stringify(req.body));
     const mobile = parseInt(req.body.mobile)
-    if (mobile == null ) {
+    if (mobile == null) {
         //console.log("mobile:"+mobile+"email:"+req.body.email+"name:"+req.body.name+"password:"+req.body.password);
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
@@ -186,7 +186,7 @@ exports.resetPasswordValidation = async function (req, res, next) {
         mobile: mobile,
         notificationTypeCode: "RESET_PASSWORD_OTP",
         operator_id: "resetPasswordValidation",
-   };
+    };
     sendOTPSMS(input);
 
     return res.status(200).send({ status: "success", message: "OTP Sent Succesdully!" });
@@ -204,7 +204,7 @@ exports.signupUser = async function (req, res, next) {
     const mobile = parseInt(req.body.mobile)
 
     console.log('req.body: ' + JSON.stringify(req.body));
-    if (mobile == null || req.body.name == null || req.body.password == null || req.body.mobile_validated !== true ) {
+    if (mobile == null || req.body.name == null || req.body.password == null || req.body.mobile_validated !== true) {
         //console.log("mobile:"+mobile+"email:"+req.body.email+"name:"+req.body.name+"password:"+req.body.password);
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
@@ -215,7 +215,7 @@ exports.signupUser = async function (req, res, next) {
         return res.status(200).send({ status: 403, message: 'Mobile number is already in use.' });
     }
 
-    
+
 
     if (req.body.email !== '') {
         existingUser = await UserService.getByEmail(req.body.email);
@@ -223,7 +223,7 @@ exports.signupUser = async function (req, res, next) {
             return res.status(200).send({ status: 403, message: 'Email address is already in use.' });
         }
     }
-    
+
 
     console.log("password2" + req.body.password)
     var userpassword = req.body.password;
@@ -237,7 +237,7 @@ exports.signupUser = async function (req, res, next) {
         name: req.body.name,
         mobile: mobile,
         email: (req.body.email === "") ? null : req.body.email,
-        is_mobile_validated:true,
+        is_mobile_validated: true,
         operator_id: 'signupUser',
     };
     console.log('newUser: ' + JSON.stringify(newUser));
@@ -255,7 +255,7 @@ exports.signupUser = async function (req, res, next) {
 
     var newUserCredential = await UserCredentialService.create(newUserCredential);
     console.log('newUserCredential: ' + JSON.stringify(newUserCredential));
-    return res.status(200).send({ status: "success", user: newUser,message:"Signup successful!" });
+    return res.status(200).send({ status: "success", user: newUser, message: "Signup successful!" });
 
 
 }
@@ -284,7 +284,7 @@ exports.resetPassword = async function (req, res, next) {
     console.log('Passwordhash = ' + passwordData.passwordHash);
     console.log('\nSalt = ' + passwordData.salt);
     var credential = { salt: passwordData.salt, hash: passwordData.passwordHash };
- 
+
 
     var existingUserCredential = await UserCredentialService.getByUser_id(existingUser._id);
     if (existingUserCredential == null) {
@@ -293,7 +293,7 @@ exports.resetPassword = async function (req, res, next) {
     }
     await UserCredentialService.expire(existingUserCredential)
 
-    
+
 
     var newUserCredential = {
         user_id: existingUser._id,
@@ -337,11 +337,11 @@ exports.loginUser = async function (req, res, next) {
         if (existingUser == null) {
             return res.status(200).send({ status: 403, message: 'User with this email address does not exist' });
         }
-        
+
     }
 
 
-    if(existingUser.is_locked){
+    if (existingUser.is_locked) {
         return res.status(200).send({ status: 403, message: 'User Account has been locked please try again after some time.' });
 
     }
@@ -376,11 +376,11 @@ exports.loginUser = async function (req, res, next) {
     var is_wrong = false;
     var is_locked = false;
     if (passwordData.passwordHash != hash) {
-        is_wrong=true;
+        is_wrong = true;
 
         failed_attempts++;
 
-        if (existingUser.unsuccessful_attempts>= 4) {
+        if (existingUser.unsuccessful_attempts >= 4) {
             is_locked = true;
 
         }
@@ -393,13 +393,13 @@ exports.loginUser = async function (req, res, next) {
         last_login_attempt: new Date(),
         operator_id: 'loginUser',
     };
-    var updateUser = await UserService.update(existingUser._id,updateUser);
+    var updateUser = await UserService.update(existingUser._id, updateUser);
 
-    if(is_locked) {
-    return res.status(200).send({ status: 403, message: 'Incorrect password, too many unsuccessful_attempts pelase try again after 30 minutes. ' });
+    if (is_locked) {
+        return res.status(200).send({ status: 403, message: 'Incorrect password, too many unsuccessful_attempts pelase try again after 30 minutes. ' });
     }
-    console.log("is wrong: "+is_wrong);
-    if(is_wrong){
+    console.log("is wrong: " + is_wrong);
+    if (is_wrong) {
         return res.status(200).send({ status: 403, message: 'Incorrect password' });
     }
 
@@ -413,7 +413,7 @@ exports.loginUser = async function (req, res, next) {
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
     }
 
-    var existingUserSession = await UserSessionServices.getByUserIdSessionTypeId(existingUser._id,sessionType._id);
+    var existingUserSession = await UserSessionServices.getByUserIdSessionTypeId(existingUser._id, sessionType._id);
     if (existingUserSession !== null) {
         await UserSessionServices.expire(existingUserSession)
     }
@@ -426,35 +426,35 @@ exports.loginUser = async function (req, res, next) {
 
     var newUserSession = await UserSessionServices.create(newUserSession);
     console.log('newUserSession: ' + JSON.stringify(newUserSession));
-    return res.status(200).send({ status: "success", user_session: newUserSession, user:updateUser, message: "Welcome back "+updateUser.name });
+    return res.status(200).send({ status: "success", user_session: newUserSession, user: updateUser, message: "Welcome back " + updateUser.name });
 
 
 }
 
 exports.getExistingSession = async function (req, res, next) {
-        // console.log('In loginUser');
-        console.log('req.body: ' + JSON.stringify(req.body));
-        if ((req.body.user_id == null)) {
-    
-            console.log("user_id:" + req.body.user_id );
-            return res.status(200).send({ status: 403, message: 'Missing paramters' });
-    
-        }
+    // console.log('In loginUser');
+    console.log('req.body: ' + JSON.stringify(req.body));
+    if ((req.body.user_id == null)) {
+
+        console.log("user_id:" + req.body.user_id);
+        return res.status(200).send({ status: 403, message: 'Missing paramters' });
+
+    }
 
     var sessionType = await RefSessionTypesService.getByCode('LOGIN');
-if (sessionType == null) {
-    return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
-}
-var existingUser = await UserService.getById(req.body.user_id);
-if (existingUser == null) {
-    return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
-}
+    if (sessionType == null) {
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+    }
+    var existingUser = await UserService.getById(req.body.user_id);
+    if (existingUser == null) {
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+    }
 
-var existingUserSession = await UserSessionServices.getByUserIdSessionTypeId(existingUser._id,sessionType._id);
-if (existingUserSession == null) {
-    return res.status(200).send({ status: 403, message: 'No session found' });
-}    
-return res.status(200).send({ status: "success", user_session: existingUserSession});
+    var existingUserSession = await UserSessionServices.getByUserIdSessionTypeId(existingUser._id, sessionType._id);
+    if (existingUserSession == null) {
+        return res.status(200).send({ status: 403, message: 'No session found' });
+    }
+    return res.status(200).send({ status: "success", user_session: existingUserSession });
 
 
 }
@@ -462,17 +462,17 @@ return res.status(200).send({ status: "success", user_session: existingUserSessi
 exports.saveUserDeviceToken = async function (req, res, next) {
     // console.log('In saveDeviceCode');
     console.log('req.body: ' + JSON.stringify(req.body));
-    if ((req.body.user_id == null)||(req.body.device_token == null)) {
+    if ((req.body.user_id == null) || (req.body.device_token == null)) {
 
-        console.log("user_id:" + req.body.user_id +"device_token:" + req.body.device_token );
+        console.log("user_id:" + req.body.user_id + "device_token:" + req.body.device_token);
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
     }
     var existingUser = await UserService.getById(req.body.user_id);
     if (existingUser == null) {
-    return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
     }
-    
+
     var newUserDeviceToken = {
         user_id: existingUser._id,
         device_token: req.body.device_token,
@@ -483,77 +483,81 @@ exports.saveUserDeviceToken = async function (req, res, next) {
     console.log('newUserDeviceToken: ' + JSON.stringify(newUserDeviceToken));
     if (newUserDeviceToken == null) {
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
-        }
+    }
     return res.status(200).send({ status: "success", user_device_token: newUserDeviceToken, message: "Saved user dvice successfully" });
 
 
 }
 
-exports.sendInAppNotification = async function (input){
+exports.sendInAppNotification = async function (req, res, next) {
     console.log('req.body: ' + JSON.stringify(req.body));
-    if ((req.body.user_id == null)||(req.body.notification_type_code == null)) {
+    if ((req.body.user_id == null) || (req.body.notification_type_code == null)) {
 
-        console.log("user_id:" + req.body.user_id +"notification_type_code:" + req.body.notification_type_code );
+        console.log("user_id:" + req.body.user_id + "notification_type_code:" + req.body.notification_type_code);
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
     }
 
     var UserDeviceToken = await UserDeviceTokensService.getByUserId(req.body.user_id);
     if (UserDeviceToken == null) {
-    return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
     }
-    
+
     var NotificationType = await RefNotificationTypesService.getByCode(req.body.notification_type_code);
     if (NotificationType == null) {
-    return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
     }
-    
-    
+
+
 
 
     const admin = require('firebase-admin');
+    var serviceAccount = require("../env/paw-feedr.json");
 
-    // Initialize the Firebase Admin SDK
-    admin.initializeApp({
-      credential: admin.credential.cert('117232364230276918874'),
-    });
-    
-    // Function to send a push notification
-    async function sendPushNotification(message) {
-      try {
-        const message = message;
-    
-        const response = await admin.messaging().send(message);
-        console.log('Successfully sent push notification:', response);
-      } catch (error) {
-        console.error('Error sending push notification:', error);
-    return res.status(200).send({ status: 403, message: 'Error sending push notification:', error });
-          
-      }
+    // Check if the app is already initialized
+    if (admin.apps.length === 0) {
+        // Initialize the Firebase Admin SDK
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+        });
     }
-    
-    
-   var message = {
+
+    // Function to send a push notification
+    async function sendPushNotification(message1) {
+        try {
+            const message = message1;
+
+            const response = await admin.messaging().send(message);
+            console.log('Successfully sent push notification:', response);
+        } catch (error) {
+            console.error('Error sending push notification:', error);
+            return res.status(200).send({ status: 403, message: 'Error sending push notification:', error });
+
+        }
+    }
+
+
+    var message = {
         token: UserDeviceToken.device_token,
-     notification:{
-        title: NotificationType.title,
-        body : NotificationType.message,
-     }
+        notification: {
+            title: NotificationType.title,
+            body: NotificationType.message,
+        }
     };
 
     var newInAppMessage = {
         user_device_token_id: UserDeviceToken._id,
         notification_type_id: NotificationType._id,
-        message:message,
+        message: message,
         operator_id: 'sendInAppNotification'
     };
 
     var newInAppMessage = await InAppMessagesServices.create(newInAppMessage);
     if (newInAppMessage == null) {
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
-        }
+    }
     console.log('newInAppMessage: ' + JSON.stringify(newInAppMessage))
-    
+
     sendPushNotification(message);
     return res.status(200).send({ status: "success", in_app_message: newInAppMessage, message: "Saved user dvice successfully" });
 
