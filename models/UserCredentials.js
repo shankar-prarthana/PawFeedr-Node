@@ -121,7 +121,7 @@ exports.expire = async function (input) {
         };
         // console.log('newset: ' + JSON.stringify(newset));
 
-        var data = await myDB.collection(COLLECTION_NAME).findOneAndUpdate(query, newset, { returnOriginal: false });
+        var data = await myDB.collection(COLLECTION_NAME).updateMany(query, newset, { returnOriginal: false });
        // console.log("data: " + JSON.stringify(data));
 
         return data.value;

@@ -77,14 +77,14 @@ exports.getById = async function (_id, options = null) {
 //UsersSessions create table function
 
 exports.create = async function (input) {
-    // console.log('In createSession');
-    // console.log('input: ' + JSON.stringify(input));
+     console.log('In createSession');
+     console.log('input: ' + JSON.stringify(input));
 
     var sessionType = await refSessionTypesService.getById(input.session_type_id);
     // console.log('sessionType: ' + JSON.stringify(sessionType));
 
     if (!sessionType.allow_concurrent_sessions) {
-        var expire_input = {user_id:new ObjectId(input.user_id), session_type_id: new ObjectId(input.session_type_id)}
+        var expire_input = { user_id:new ObjectId(input.user_id), session_type_id: new ObjectId(input.session_type_id)}
         await this.expire(expire_input);
     }
 
@@ -121,8 +121,8 @@ exports.create = async function (input) {
 }
 
 exports.expire = async function (input) {
-    // console.log('In create');
-    //console.log('input: ' + JSON.stringify(input));
+     console.log('In expire');
+    console.log('input: ' + JSON.stringify(input));
 
     var now = new Date();
     
@@ -131,7 +131,7 @@ exports.expire = async function (input) {
             user_id: new ObjectId(input.user_id),
             session_type_id: new ObjectId(input.session_type_id)
         };
-        // console.log('query: ' + JSON.stringify(query));
+        console.log('query: ' + JSON.stringify(query));
 
         const newset = {
             $set: {
@@ -139,10 +139,10 @@ exports.expire = async function (input) {
                 modified_date: now,
             },
         };
-        // console.log('newset: ' + JSON.stringify(newset));
+        console.log('newset: ' + JSON.stringify(newset));
 
-        var data = await myDB.collection(COLLECTION_NAME).findOneAndUpdate(query, newset, { returnOriginal: false });
-       // console.log("data: " + JSON.stringify(data));
+        var data = await myDB.collection(COLLECTION_NAME).updateMany(query, newset, { returnOriginal: false });
+       console.log("data: " + JSON.stringify(data));
 
         return data.value;
     } catch (e) {

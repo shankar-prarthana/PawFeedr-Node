@@ -19,17 +19,7 @@ var genRandomString = function (length) {
         .slice(0, length);
 };
 
-var sha512 = function (password, salt) {
-    var hash = crypto.createHmac('sha512', password + salt); /** Hashing algorithm sha512 */
-    console.log("hash" + hash);
-    var value = hash.digest('hex');
-    return {
-        salt: salt,
-        passwordHash: value
-    };
-};
-
-sendOTPSMS = async function (input) {
+var sendOTPSMS = async function (input) {
     const phoneNumber = "+91" + input.mobile;
     const mobile = input.mobile;
     const accountSid = 'ACe0a74a4f8fac5352c07ef03e229fe295';
@@ -90,6 +80,7 @@ sendOTPSMS = async function (input) {
 
     console.log("MESSAGE: " + message);
     var newMobileMessage = {
+        mobile: mobile,
         message: message,
         notfication_type_id: notificationType._id,
         operator_id: op,
@@ -99,20 +90,31 @@ sendOTPSMS = async function (input) {
 
 
 
-    // client.messages
-    //     .create({
-    //         body: message,
-    //         from: from,
-    //         to: phoneNumber
-    //     })
-    //     .then(message => console.log(message.sid))
+    client.messages
+        .create({
+            body: message,
+            from: from,
+            to: phoneNumber
+        })
+        .then(message => console.log(message.sid))
 }
+var sha512 = function (password, salt) {
+    var hash = crypto.createHmac('sha512', password + salt); /** Hashing algorithm sha512 */
+    console.log("hash" + hash);
+    var value = hash.digest('hex');
+    return {
+        salt: salt,
+        passwordHash: value
+    };
+};
+
+
 exports.validateMobileNumber = async function (req, res, next) {
-    // console.log('In signupUser');
+    console.log('In signupUser');
     console.log('req.body: ' + JSON.stringify(req.body));
     const mobile = parseInt(req.body.mobile)
     if (mobile == null) {
-        //console.log("mobile:"+mobile+"email:"+req.body.email+"name:"+req.body.name+"pa    ssword:"+req.body.password);
+        console.log("mobile:"+mobile);
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
     }
@@ -128,7 +130,7 @@ exports.validateMobileNumber = async function (req, res, next) {
     };
     sendOTPSMS(input);
 
-    return res.status(200).send({ status: "success", message: "OTP Sent Succesdully!" });
+    return res.status(200).send({ status: "success", message: "OTP Sent Successfully!" });
 
 
 
@@ -189,7 +191,7 @@ exports.resetPasswordValidation = async function (req, res, next) {
     };
     sendOTPSMS(input);
 
-    return res.status(200).send({ status: "success", message: "OTP Sent Succesdully!" });
+    return res.status(200).send({ status: "success", message: "OTP Sent Successfully!" });
 
 
 }
