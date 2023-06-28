@@ -38,6 +38,39 @@ exports.getByUserIdSessionTypeId = async function (user_id, session_type_id, opt
         throw Error('Error')
     }
 }
+
+exports.getByToken = async function ( token, options = null) {
+    // console.log('In getByUser_id');
+    // console.log('user_id: ' + user_id);
+    // console.log('options: ' + JSON.stringify(options));
+
+    try {
+        const query = {
+            token: token,
+            expiration_date: { $gte: new Date() },
+        };
+        // console.log('query: ' + JSON.stringify(query));
+
+        if (options === null) {
+            options = {
+                projection: {
+                    creation_date: 0,
+                    modified_date: 0,
+                    operator_id: 0,
+                },
+            };
+        }
+        // console.log('options: ' + JSON.stringify(options));
+
+        var data = await myDB.collection(COLLECTION_NAME).findOne(query, options);
+        // console.log("data: " + JSON.stringify(data));
+
+        return data;
+    } catch (e) {
+        console.log(e);
+        throw Error('Error')
+    }
+}
 //UsersSessions_getById function
 exports.getById = async function (_id, options = null) {
     // console.log('In getById');

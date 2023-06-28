@@ -17,8 +17,10 @@
     "express-fileupload": "^1.4.0",
     "firebase-admin": "^11.9.0",
     "http-errors": "^2.0.0",
+    "jade": "^1.11.0",
     "mongodb": "^5.6.0",
     "morgan": "^1.10.0",
+    "python": "^0.0.4",
     "telesignsdk": "^2.2.3",
     "twilio": "^4.11.2"
   }

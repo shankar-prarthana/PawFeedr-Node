@@ -51,6 +51,7 @@ app.listen(port, () => {
 
 app.use('/mediproc/ref', require('./routes/reference.routes'));
 app.use('/mediproc/user', require('./routes/user.routes'));
+app.use('/mediproc/pet', require('./routes/pet.routes'));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

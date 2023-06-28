@@ -7,6 +7,7 @@ var RefNotificationTypesService = require('../models/refNotificationTypes');
 var MobileOTPsService = require('../models/MobileOTPs');
 var MobileMessagesService = require('../models/MobileMessages');
 var UserDeviceTokensService = require('../models/UserDeviceTokens')
+var PetsServices = require('../models/Pets')
 var InAppMessagesServices = require('../models/InAppMessages')
 var TeleSignSDK = require('telesignsdk');
 
@@ -164,6 +165,21 @@ exports.verifyOTP = async function (req, res, next) {
     }
 
     await MobileOTPsService.expire(mobileOtp);
+
+    if(req.body.notificationTypeCode=="CHANGE_MOBILE_OTP" ){
+        if (user_id == null) {
+            console.log("user_id:" + user_id );
+            return res.status(200).send({ status: 403, message: 'Missing paramters' });
+    
+        }
+        var updateUser = {
+            mobile: mobile,
+            operator_id: 'changeMobile',
+        };
+        var updateUser = await UserService.update(req.body.user_id, updateUser);
+        return res.status(200).send({ status: "success", message: "Mobile number changed Successfully" });
+
+    }
     return res.status(200).send({ status: "success", message: "Mobile validated Successfully" });
 
 
@@ -428,7 +444,10 @@ exports.loginUser = async function (req, res, next) {
 
     var newUserSession = await UserSessionServices.create(newUserSession);
     console.log('newUserSession: ' + JSON.stringify(newUserSession));
-    return res.status(200).send({ status: "success", user_session: newUserSession, user: updateUser, message: "Welcome back " + updateUser.name });
+
+  
+
+        return res.status(200).send({ status: "success", user_session: newUserSession, user: updateUser, message: "Welcome back " + updateUser.name });
 
 
 }
@@ -562,6 +581,32 @@ exports.sendInAppNotification = async function (req, res, next) {
 
     sendPushNotification(message);
     return res.status(200).send({ status: "success", in_app_message: newInAppMessage, message: "Saved user dvice successfully" });
+
+
+}
+
+exports.changeMobile = async function (req, res, next) {
+    // console.log('In sendValidationOTP');
+    console.log('req.body: ' + JSON.stringify(req.body));
+    const mobile = parseInt(req.body.mobile)
+    if (mobile == null) {
+        //console.log("mobile:"+mobile+"email:"+req.body.email+"name:"+req.body.name+"password:"+req.body.password);
+        return res.status(200).send({ status: 403, message: 'Missing paramters' });
+
+    }
+
+    var existingUser = await UserService.getByMobile(mobile);
+    if (existingUser == null) {
+        return res.status(200).send({ status: 403, message: 'Mobile number not asscoiated with any account.' });
+    }
+    var input = {
+        mobile: mobile,
+        notificationTypeCode: "CHANGE_MOBILE_OTP",
+        operator_id: "changeMobile",
+    };
+    sendOTPSMS(input);
+
+    return res.status(200).send({ status: "success", message: "OTP Sent Successfully!" });
 
 
 }
