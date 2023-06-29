@@ -5,18 +5,19 @@ var ObjectId = require('mongodb').ObjectId;
 
 //UsersSessions_getByUser_id function
 
-exports.getByMobileNotificationTypeId = async function (mobile,notfication_type_id, options = null) {
-    // console.log('In getByMobile');
+exports.getByMobileNotificationTypeId = async function (mobile,notification_type_id, options = null) {
+     console.log('In getByMobile');
     // console.log('mobile: ' + mobile);
     // console.log('options: ' + JSON.stringify(options));
+    var currentDate = new Date();
 
     try {
         const query = {
             mobile: mobile,
-            notfication_type_id: notfication_type_id,
-            expiration_date: { $gte: new Date() },
-        };
-        // console.log('query: ' + JSON.stringify(query));
+            notification_type_id: new ObjectId(notification_type_id),
+            expiration_date: { $gt: new Date() },       
+         };
+         console.log('query: ' + JSON.stringify(query));
 
         if (options === null) {
             options = {
@@ -93,7 +94,7 @@ exports.create = async function (input) {
       const otp = generateOTP(otpType.length);
 
     var now = new Date();
-    var expiry = new Date(now);
+    var expiry = new Date();
     expiry.setMinutes(expiry.getMinutes() + otpType.expiration_interval);
      console.log('now: ' + now);
      console.log('expiry: ' + expiry);

@@ -170,6 +170,7 @@ exports.expire = async function (input) {
             $set: {
                 expiration_date: now,
                 modified_date: now,
+                operator_id:"expire"
             },
         };
         console.log('newset: ' + JSON.stringify(newset));

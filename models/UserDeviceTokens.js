@@ -123,7 +123,6 @@ exports.expire = async function (input) {
     try {
         const query = {
             user_id: new ObjectId(input.user_id),
-            session_type_id: new ObjectId(input.session_type_id)
         };
         // console.log('query: ' + JSON.stringify(query));
 
@@ -131,6 +130,7 @@ exports.expire = async function (input) {
             $set: {
                 expiration_date: now,
                 modified_date: now,
+                operator_id:"expire"
             },
         };
         // console.log('newset: ' + JSON.stringify(newset));

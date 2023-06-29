@@ -35,6 +35,10 @@ router.post('/signupUser', UserController.signupUser);
 router.post('/loginUser', UserController.loginUser);
 router.post('/saveUserDeviceToken', UserController.saveUserDeviceToken);
 router.post('/sendInAppNotification',UserController.sendInAppNotification);
-
+router.post('/logout', UserController.logout);
+router.post('/changeMobile', UserController.changeMobile);
+router.post('/getUserNotification', UserController.getUserNotification);
+router.post('/updateUser', UserController.updateUser);
+router.post('/updateUserNotification', UserController.updateUserNotification);
 
 module.exports = router;

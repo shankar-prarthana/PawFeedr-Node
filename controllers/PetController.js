@@ -183,6 +183,7 @@ pythonScript.stdout.on('data', (data) => {
                 pet_schedule_id: newPetSchedule._id,
                 amount: newPetSchedule.portion,
                 schedule_date: dateWithoutTime,
+                schedule_time:targetTime,
                 operator_id: 'addPet',
             };
 
@@ -350,12 +351,43 @@ exports.getProfile = async function (req, res, next) {
         console.log("in UserService");
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
-    const Pet = await PetsServices.getByUserId(existingUser._id);
+    var Pet = await PetsServices.getByUserId(existingUser._id);
 
     if (Pet == null) {
         console.log("in PetsServices");
-        return res.status(200).send({ status: 'no_pet', message: 'There is no pet added' });
+        return res.status(200).send({ status: 'no_pet',user:existingUser, message: 'There is no pet added' });
     }
+    var ageType = await RefAgeTypesService.getById(Pet.age_type_id);
+    if (ageType == null) {
+        console.log("in UserService");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+    var petType = await RefPetTypesService.getById(Pet.pet_type_id);
+    if (petType == null) {
+        console.log("in petType");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+    var petSizeType = await RefPetSizeTypesService.getById(Pet.pet_size_type_id);
+    if (petSizeType == null) {
+        console.log("in petSizeType");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+
+    }
+
+    var foodType = await RefFoodTypesService.getById(Pet.food_type_id);
+    if (foodType == null) {
+        console.log("in foodType");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+    var activityLevelType = {}
+    if (petType.code=="dog") {
+         activityLevelType = await RefActivityLevelTypesService.getById(Pet.activity_level_type_id);
+        if (activityLevelType == null) {
+            console.log("in activityLevelType");
+            return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+        }
+    }
+    Pet = {pet:Pet, food_type:foodType,pet_size_type:petSizeType, pet_type: petType, age_type:ageType};
     
     return res.status(200).send({ status: 'success', pet: Pet,user:existingUser, message:'Got pet History successfully!' });
 }
