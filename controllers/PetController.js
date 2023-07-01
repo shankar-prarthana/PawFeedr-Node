@@ -10,15 +10,7 @@ var PetFeedServices = require('../models/PetFeed');
 var UserSessionServices = require('../models/UserSessions');
 var UserService = require('../models/Users');
 const path = require('path');
-const  DateTime = require('luxon');
 
-// Set the default timezone
-DateTime.local().setZone('Asia/Kolkata');
-
-// Override the Date object's prototype
-Date.prototype.toMoment = function () {
-  return moment(this).tz(defaultTimezone);
-};
 // Assuming your `dog.py` file is located in the `assets` directory within the project
 const fileDogPath = path.join(__dirname, '..', 'assets', 'dog.py');
 const fileCatPath = path.join(__dirname, '..', 'assets', 'cat.py');
@@ -185,16 +177,12 @@ pythonScript.stdout.on('data', (data) => {
 
 
     for (let i = 0; i < newPetSchedule.frequency; i++) {
-        var currentTime = DateTime.local();
-        const targetTime = DateTime.local();
-
+        const currentTime = new Date();
+        const targetTime = new Date();
         const timeParts = newPetSchedule.timings[i].split(":");
         const hour = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);
-        targetTime.set({ hour, minute });
-
-            console.log('currentTime: ' + currentTime);
-            console.log('targetTime: ' +targetTime );
+        targetTime.setHours(hour, minutes);
 
         if (currentTime < targetTime) {
             
