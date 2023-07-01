@@ -10,10 +10,10 @@ var PetFeedServices = require('../models/PetFeed');
 var UserSessionServices = require('../models/UserSessions');
 var UserService = require('../models/Users');
 const path = require('path');
-const moment = require('moment-timezone');
+const  DateTime = require('luxon');
 
 // Set the default timezone
-const defaultTimezone = 'Asia/Kolkata';
+DateTime.local().setZone('Asia/Kolkata');
 
 // Override the Date object's prototype
 Date.prototype.toMoment = function () {
@@ -185,14 +185,13 @@ pythonScript.stdout.on('data', (data) => {
 
 
     for (let i = 0; i < newPetSchedule.frequency; i++) {
-        var currentDate = new Date();
-        var currentTime = currentDate.toMoment();
-        const targetTime = currentDate.toMoment();
+        var currentTime = DateTime.local();
+        const targetTime = DateTime.local();
 
         const timeParts = newPetSchedule.timings[i].split(":");
         const hour = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);
-        targetTime.hours(hour).minutes(minutes);
+        targetTime.set({ hour, minute });
 
             console.log('currentTime: ' + currentTime);
             console.log('targetTime: ' +targetTime );
