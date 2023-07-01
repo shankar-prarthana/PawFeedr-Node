@@ -26,7 +26,13 @@ router.use(bodyParser.urlencoded({ limit: '500mb', extended: false, parameterLim
 router.use(bodyParser.json({ limit: '500mb' }));
 
 router.use(fileupload());
-
+router.use(function (req, res, next) {
+    process.env.TZ = 'Asia/Calcutta'; // Set the desired timezone
+  
+    // Continue processing the next middleware/route handler
+    next();
+  });
+  
 router.post('/addPet', PetController.addPet);
 router.post('/getPet', PetController.getPet);
 router.post('/getPetHome', PetController.getPetHome);

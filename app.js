@@ -4,17 +4,18 @@ const path = require('path');
 const cors = require("cors");
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
-const express = require('express')
-var createError = require('http-errors');
-const app = express()
-const port = 3000
+const express = require('express');
+const createError = require('http-errors');
+const { DateTime } = require('luxon');
+
+const app = express();
+const port = 3000;
 
 const username = encodeURIComponent('prarthana');
 const password = encodeURIComponent('PraSid@78');
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const mongoDBUrl = "mongodb+srv://" + username + ":" + password + "@mediproc.undefug.mongodb.net/?retryWrites=true&w=majority";
-// console.log('mongoDBUrl: ' + mongoDBUrl);
 
 const client = new MongoClient(mongoDBUrl, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 const myDB = client.db('mediproc');
@@ -37,7 +38,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(function (req, res, next) {
-  res.setHeader('Server', 'utf')
+  res.setHeader('Server', 'utf');
+  next();
+});
+
+// Middleware to set default timezone for all routes
+app.use(function (req, res, next) {
+  process.env.TZ = 'Asia/Calcutta'; // Set the desired timezone
+
+  // Continue processing the next middleware/route handler
   next();
 });
 

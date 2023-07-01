@@ -24,7 +24,13 @@ router.use(acceptMethods);
 
 router.use(bodyParser.urlencoded({ limit: '500mb', extended: false, parameterLimit: 1000000 }));
 router.use(bodyParser.json({ limit: '500mb' }));
-
+router.use(function (req, res, next) {
+    process.env.TZ = 'Asia/Calcutta'; // Set the desired timezone
+  
+    // Continue processing the next middleware/route handler
+    next();
+  });
+  
 router.use(fileupload());
 router.post('/validateMobileNumber', UserController.validateMobileNumber);
 router.post('/verifyOTP', UserController.verifyOTP);
