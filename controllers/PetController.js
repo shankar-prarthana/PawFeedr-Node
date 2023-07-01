@@ -184,6 +184,9 @@ pythonScript.stdout.on('data', (data) => {
         const minutes = parseInt(timeParts[1], 10);
         targetTime.setHours(hour, minutes);
 
+            console.log('currentTime: ' + currentTime);
+            console.log('targetTime: ' +targetTime );
+
         if (currentTime < targetTime) {
             
             var newPetFeed = {
