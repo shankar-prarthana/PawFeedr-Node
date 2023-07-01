@@ -9,8 +9,12 @@ var PetSchedulesServices = require('../models/PetSchedule');
 var PetFeedServices = require('../models/PetFeed');
 var UserSessionServices = require('../models/UserSessions');
 var UserService = require('../models/Users');
-const fileDogPath = 'C:\\Prarthana\\PROJECTS\\GitHub\\PawFeedr-Node\\assets\\dog.py';
-const fileCatPath = 'C:\\Prarthana\\PROJECTS\\GitHub\\PawFeedr-Node\\assets\\cat.py';
+const path = require('path');
+
+// Assuming your `dog.py` file is located in the `assets` directory within the project
+const fileDogPath = path.join(__dirname, '..', 'assets', 'dog.py');
+const fileCatPath = path.join(__dirname, '..', 'assets', 'cat.py');
+
 
 const { spawn } = require('child_process');
 
