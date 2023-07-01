@@ -92,10 +92,10 @@ exports.addPet = async function (req, res, next) {
     
     var pythonScript = null
     if (petType.code == "dog") {
-        pythonScript = spawn('python.exe', [fileDogPath, req.body.petSizeCode, req.body.weight, req.body.activityLevelTypeCode, req.body.ageCode]);
+        pythonScript = spawn('python3', [fileDogPath, req.body.petSizeCode, req.body.weight, req.body.activityLevelTypeCode, req.body.ageCode]);
     }
     else {
-        pythonScript = spawn('python.exe', [fileCatPath, req.body.weight, req.body.ageCode]);
+        pythonScript = spawn('python3', [fileCatPath, req.body.weight, req.body.ageCode]);
     }
 
 
@@ -260,7 +260,7 @@ exports.getPetSchedule = async function (req, res, next) {
         console.log("in PetFeed");
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
-    console.log({ status: 'success', pet: Pet,pet_food_amount:PetFoodAmount,pet_schedule:PetSchedule, pet_feeds:PetFeeds, message:'Got pet schedule successfully!' }.toString);
+    console.log("");
 
     return res.status(200).send({ status: 'success', pet: Pet,pet_food_amount:PetFoodAmount,pet_schedule:PetSchedule, pet_feeds:PetFeeds, message:'Got pet schedule successfully!' });
 }
