@@ -106,8 +106,7 @@ exports.getTodayFeeds = async function (pet_schedule_id, options = null) {
             $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // Add 24 hours to get the end of the day
           },
           status: {
-            $ne: 'expired',
-            $ne: 'failed'
+            $ne: 'expired'
           }
         
       };

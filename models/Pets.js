@@ -39,7 +39,7 @@ exports.getByUserId = async function (user_id, options = null) {
 }
 
 exports.getById = async function (id, options = null) {
-    // console.log('In getById');
+     console.log('In getById');
     // console.log('id: ' + id);
     // console.log('options: ' + JSON.stringify(options));
 
@@ -48,7 +48,7 @@ exports.getById = async function (id, options = null) {
             _id: new ObjectId(id),
             is_active : true, 
         };
-        // console.log('query: ' + JSON.stringify(query));
+         console.log('query: ' + JSON.stringify(query));
 
         if (options === null) {
             options = {

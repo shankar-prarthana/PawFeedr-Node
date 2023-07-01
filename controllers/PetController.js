@@ -160,7 +160,7 @@ pythonScript.stdout.on('data', (data) => {
         pet_food_amount_id: newPetFoodAmount._id,
         portion: portion.toFixed(0),
         frequency: 3,
-        timings: [9, 13, 19],
+        timings: ["09:30", "13:00", "19:00"],
         operator_id: 'addPet',
     };
 
@@ -172,17 +172,19 @@ pythonScript.stdout.on('data', (data) => {
 
 
 
-    const dateWithoutTime = new Date();
-    dateWithoutTime.setHours(0, 0, 0, 0);
     for (let i = 0; i < newPetSchedule.frequency; i++) {
         const currentTime = new Date();
         const targetTime = new Date();
-        targetTime.setHours(newPetSchedule.timings[i], 0, 0, 0);
+        const timeParts = newPetSchedule.timings[i].split(":");
+        const hour = parseInt(timeParts[0], 10);
+        const minutes = parseInt(timeParts[1], 10);
+        targetTime.setHours(hour, minutes);
+
         if (currentTime < targetTime) {
             var newPetFeed = {
                 pet_schedule_id: newPetSchedule._id,
+                timing:newPetSchedule.timings[i],
                 amount: newPetSchedule.portion,
-                schedule_date: dateWithoutTime,
                 schedule_time:targetTime,
                 operator_id: 'addPet',
             };
@@ -413,6 +415,29 @@ exports.removePet = async function (req, res, next) {
     var updateUser = await PetsServices.update(Pet._id, updateUser);
 
 
+   
+    
+    return res.status(200).send({ status: 'success', message:'Removed pet successfully!' });
+}
+
+exports.cancelFeed = async function (req, res, next) {
+    // console.log('In getAllCountries');
+    if ((req.body.pet_feed_id == null)) {
+
+        console.log("pet_feed_id:" + req.body.pet_feed_id );
+        return res.status(200).send({ status: 403, message: 'Missing paramters' });
+
+    }
+    var petFeed = await PetFeedServices.getById(req.body.pet_feed_id);
+    if (petFeed == null) {
+        console.log("in PetFeedServices");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+    var newPetFeed = {
+        status: "cancelled",
+        operator_id: 'cancelFeed',
+    };
+    var newPetFeed = await PetFeedServices.update(pet_feed_id._id,newPetFeed);
    
     
     return res.status(200).send({ status: 'success', message:'Removed pet successfully!' });
