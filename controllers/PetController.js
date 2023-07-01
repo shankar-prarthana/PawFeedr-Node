@@ -395,8 +395,11 @@ exports.getProfile = async function (req, res, next) {
             return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
         }
     }
+   
     Pet = {pet:Pet, food_type:foodType,pet_size_type:petSizeType, pet_type: petType, age_type:ageType};
-    
+    if (activityLevelType!==null){
+        Pet.activity_level_type = activityLevelType;
+    }
     return res.status(200).send({ status: 'success', pet: Pet,user:existingUser, message:'Got pet History successfully!' });
 }
 
@@ -447,4 +450,199 @@ exports.cancelFeed = async function (req, res, next) {
    
     
     return res.status(200).send({ status: 'success', message:'Removed pet successfully!' });
+}
+exports.updatePet = async function (req, res, next) {
+    // console.log('In addPet');
+    console.log('req.body: ' + JSON.stringify(req.body));
+    if ((req.body.pet_id == null) || (req.body.name == null) || (req.body.petTypeCode == null) || (req.body.ageCode == null) || (req.body.gender == null) || (req.body.weight == null) || (req.body.petSizeCode == null) || (req.body.foodTypeCode == null)) {
+
+        console.log("token:" + req.body.token + "name:" + req.body.name + "petTypeCode:" + req.body.petTypeCode + "ageCode:" + req.body.ageCode + "gender:" + req.body.gender + "weight:" + req.body.weight + "petSizeCode:" + req.body.petSizeCode + "foodTypeCode:" + req.body.foodTypeCode);
+        return res.status(200).send({ status: 403, message: 'Missing paramters' });
+
+    }
+ 
+    var existingPet = await PetsServices.getById(req.body.pet_id);
+    if (existingPet == null) {
+        console.log("in PetsServices");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+   
+    var petType = await RefPetTypesService.getByCode(req.body.petTypeCode);
+    if (petType == null) {
+        console.log("in petType");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+    var petSizeType = await RefPetSizeTypesService.getByCodePetTypeId(req.body.petSizeCode, petType._id);
+    if (petSizeType == null) {
+        console.log("in petSizeType");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+
+    }
+
+    var ageType = await RefAgeTypesService.getByCode(req.body.ageCode);
+    if (ageType == null) {
+        console.log("in ageType");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+
+    var foodType = await RefFoodTypesService.getByCode(req.body.foodTypeCode);
+    if (foodType == null) {
+        console.log("in foodType");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+    var activityLevelType = {}
+    if (req.body.activityLevelTypeCode != null) {
+         activityLevelType = await RefActivityLevelTypesService.getByCode(req.body.activityLevelTypeCode);
+        if (activityLevelType == null) {
+            console.log("in activityLevelType");
+            return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+        }
+    }
+
+    var updatePet = {
+        pet_type_id: petType._id,
+        pet_size_type_id: petSizeType._id,
+        age_type_id: ageType._id,
+        gender: req.body.gender,
+        name: req.body.name,
+        weight: req.body.weight,
+        food_type_id: foodType._id,
+        operator_id: 'updatePet',
+
+    };
+    if (petType.code == "dog") {
+        newPet.activity_level_type_id = activityLevelType._id;
+    }
+
+    var updatePet = await PetsServices.update(existingPet._id,updatePet);
+    console.log('updatePet: ' + JSON.stringify(updatePet));
+   
+    
+    
+    var pythonScript = null
+    if (petType.code == "dog") {
+        pythonScript = spawn('python3', [fileDogPath, req.body.petSizeCode, req.body.weight, req.body.activityLevelTypeCode, req.body.ageCode]);
+    }
+    else {
+        pythonScript = spawn('python3', [fileCatPath, req.body.weight, req.body.ageCode]);
+    }
+
+
+
+var output = [];
+
+// Function to convert an Uint8Array to a string
+var uint8arrayToString = function(data){
+    return String.fromCharCode.apply(null, data);
+};
+
+
+
+pythonScript.stdout.on('data', (data) => {
+    const result = data.toString().trim(); // Convert data to string and remove leading/trailing whitespaces
+    output = result.split('\n'); // Split the result on newline characters
+  });
+  
+  const pythonScriptPromise = new Promise((resolve, reject) => {
+    pythonScript.on('exit', (code) => {
+      const calories = parseFloat(output[0] || 0); // Parse the first value as a float or default to 0
+      const dry_food = parseFloat(output[1] || 0); // Parse the second value as a float or default to 0
+      const wet_food = parseFloat(output[2] || 0); // Parse the third value as a float or default to 0
+
+      var updateFoodAmount = {
+        calories_per_day: calories,
+        dry_food_per_day: dry_food,
+        wet_food_per_day: wet_food,
+        operator_id: 'updatePet',
+      };
+
+      resolve(updateFoodAmount);
+    });
+
+    pythonScript.on('error', (error) => {
+      reject(error);
+    });
+  });
+
+  var petFoodAmount = await PetFoodAmountsService.getByPetId(existingPet._id);
+    console.log('petFoodAmount: ' + JSON.stringify(petFoodAmount));
+    if (petFoodAmount == null) {
+        console.log("in petFoodAmount");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+  // Use the variables `calories`, `dry_food`, and `wet_food` as needed
+
+
+    var updateFoodAmount =  await pythonScriptPromise;
+    updateFoodAmount = await PetFoodAmountsService.update(petFoodAmount._id,updateFoodAmount);
+    console.log('updateFoodAmount: ' + JSON.stringify(updateFoodAmount));
+    
+
+    var portion = 0.0;
+    if (foodType.code == 'dry') {
+        portion = updateFoodAmount.dry_food_per_day / 3
+    }
+    else {
+        portion = updateFoodAmount.wet_food_per_day / 3
+    }
+    var petSchedule = await PetSchedulesServices.getByPetFoodAmountId(updateFoodAmount._id);
+    console.log('petSchedule: ' + JSON.stringify(petSchedule));
+    if (petSchedule == null) {
+        console.log("in petSchedule");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+
+    var updatePetSchedule = {
+        portion: portion.toFixed(0),
+        operator_id: 'updatePet',
+    };
+
+ 
+    var updatePetSchedule = await PetSchedulesServices.update(petSchedule._id,updatePetSchedule);
+    console.log('updatePetSchedule: ' + JSON.stringify(updatePetSchedule));
+   
+    var petFeeds = await PetFeedServices.getTodayFeedsNext(updatePetSchedule._id);
+    console.log('petFeeds: ' + JSON.stringify(petFeeds));
+    for (let i = 0; i < petFeeds.length(); i++) {
+    
+                var updatePetFeed = {
+                status: 'cancelled',
+                operator_id: 'updatePet',
+            };
+
+            var updatePetFeed = await PetFeedServices.update(petFeeds[i]._id,updatePetFeed);
+            console.log('updatePetFeed: ' + JSON.stringify(updatePetFeed));
+          
+    }
+
+    for (let i = 0; i < updatePetSchedule.frequency; i++) {
+        const currentTime = new Date();
+        const targetTime = new Date();
+        const timeParts = updatePetSchedule.timings[i].split(":");
+        const hour = parseInt(timeParts[0], 10);
+        const minutes = parseInt(timeParts[1], 10);
+        targetTime.setHours(hour, minutes);
+
+        if (currentTime < targetTime) {
+            
+            var newPetFeed = {
+                pet_schedule_id: updatePetSchedule._id,
+                timing:updatePetSchedule.timings[i],
+                amount: updatePetSchedule.portion,
+                schedule_time:targetTime,
+                operator_id: 'updatePet',
+            };
+
+            var newPetFeed = await PetFeedServices.create(newPetFeed);
+            console.log('newPetFeed: ' + JSON.stringify(newPet));
+            if (newPetFeed == null) {
+                return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+            }
+        }
+    }
+
+
+    return res.status(200).send({ status: "success", pet: updatePet, pet_food_amount: updateFoodAmount, pet_schedule: updatePetSchedule, message: "Updated pet successfully!" });
+
+
 }
