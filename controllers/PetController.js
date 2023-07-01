@@ -181,6 +181,7 @@ pythonScript.stdout.on('data', (data) => {
         targetTime.setHours(hour, minutes);
 
         if (currentTime < targetTime) {
+            
             var newPetFeed = {
                 pet_schedule_id: newPetSchedule._id,
                 timing:newPetSchedule.timings[i],
@@ -259,6 +260,7 @@ exports.getPetSchedule = async function (req, res, next) {
         console.log("in PetFeed");
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
+    console.log({ status: 'success', pet: Pet,pet_food_amount:PetFoodAmount,pet_schedule:PetSchedule, pet_feeds:PetFeeds, message:'Got pet schedule successfully!' }.toString);
 
     return res.status(200).send({ status: 'success', pet: Pet,pet_food_amount:PetFoodAmount,pet_schedule:PetSchedule, pet_feeds:PetFeeds, message:'Got pet schedule successfully!' });
 }
