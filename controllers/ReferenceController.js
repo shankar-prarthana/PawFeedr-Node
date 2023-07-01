@@ -1,4 +1,4 @@
-var RefCountryService = require('../models/RefCountries');
+var RefCountryService = require('../models/refCountries');
 var RefUserRolesService = require('../models/refUserRoles');
 
 exports.getAllCountries = async function (req, res, next) {
