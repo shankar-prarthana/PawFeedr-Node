@@ -183,7 +183,7 @@ pythonScript.stdout.on('data', (data) => {
         const hour = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);
         targetTime.setHours(hour, minutes);
-        console.log('currentTime: ' + JSON.stringify(newcurrentTimePet));
+        console.log('currentTime: ' + JSON.stringify(currentTime));
         console.log('targetTime: ' + JSON.stringify(targetTime));
 
         if (currentTime < targetTime) {
