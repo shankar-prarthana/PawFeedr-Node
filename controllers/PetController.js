@@ -645,7 +645,7 @@ var isFirstFeedProcessed = false
     for (let i = 0; i < updatePetSchedule.frequency; i++) {
         const currentTime = new Date();
         const targetTime = new Date();
-        const timeParts = newPetSchedule.timings[i].split(":");
+        const timeParts = updatePetSchedule.timings[i].split(":");
         const hour = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);
         targetTime.setUTCHours(hour);
