@@ -173,6 +173,7 @@ pythonScript.stdout.on('data', (data) => {
       if (newPetSchedule == null) {
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
       }
+      var isFirstFeedProcessed = false;
       
       for (let i = 0; i < newPetSchedule.frequency; i++) {
         const currentTime = new Date();
@@ -196,12 +197,20 @@ pythonScript.stdout.on('data', (data) => {
                 schedule_time:targetTime,
                 operator_id: 'addPet',
             };
+            if (!isFirstFeedProcessed) {
+                newPetFeed.status = "upcoming";
+              }
+              else{
+                newPetFeed.status = "created";
+              }
+
 
             var newPetFeed = await PetFeedServices.create(newPetFeed);
             console.log('newPetFeed: ' + JSON.stringify(newPet));
             if (newPetFeed == null) {
                 return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
             }
+            isFirstFeedProcessed=true;
         }
     }
 
@@ -449,9 +458,22 @@ exports.cancelFeed = async function (req, res, next) {
         status: "cancelled",
         operator_id: 'cancelFeed',
     };
-    var newPetFeed = await PetFeedServices.update(petFeed._id,newPetFeed);
+
    
-    
+    var newPetFeed = await PetFeedServices.update(petFeed._id,newPetFeed);
+    if(petFeed.status == "upcoming")
+    var petNextFeed = await PetFeedServices.getTodayFeedsNext(petFeed.pet_schedule_id);
+    if (petNextFeed != null) {
+        var updateNextFeed = {
+            status: "upcoming",
+            operator_id: 'cancelFeed',
+        };   
+        var updateNextFeed = await PetFeedServices.update(petNextFeed._id,updateNextFeed);
+
+    }
+
+   
+  
     return res.status(200).send({ status: 'success', message:'Removed pet successfully!' });
 }
 exports.updatePet = async function (req, res, next) {

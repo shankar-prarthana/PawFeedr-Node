@@ -137,54 +137,49 @@ exports.getTodayFeeds = async function (pet_schedule_id, options = null) {
    }
 }
 
-exports.getTodayFeedsNext = async function (pet_schedule_id, options = null) {
+exports.getTodayFeedsNext = async function(pet_schedule_id, options = null) {
     console.log('In getTodayFeeds');
     console.log('pet_schedule_id: ' + pet_schedule_id);
-   console.log('options: ' + JSON.stringify(options));
-   const today = new Date();
-   today.setUTCHours(0, 0, 0, 0);
-
-   try {
-    const query = {
+    console.log('options: ' + JSON.stringify(options));
+  
+    const currentTime = new Date();
+  
+    try {
+      const query = {
         pet_schedule_id: new ObjectId(pet_schedule_id),
         schedule_time: {
-            $gte: today,
-            $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // Add 24 hours to get the end of the day
-          },
-          status: {
-            $ne: 'expired',
-            $ne: 'completed',
-            $ne: 'cancelled',
-            $ne: 'failed'
-          }
-        
+          $gt: currentTime
+        },
+        status: {
+          $nin: ['expired', 'completed', 'cancelled', 'failed']
+        }
       };
-    
-      
-       // console.log('query: ' + JSON.stringify(query));
-
-       if (options === null) {
-           options = {
-               sort: {
-               },
-               projection: {
-                   creation_date: 0,
-                   modified_date: 0,
-                   operator_id: 0,
-               },
-           };
-       }
-       console.log('options: ' + JSON.stringify(options));
-
-       var data = await myDB.collection(COLLECTION_NAME).find(query, options).toArray();
-       console.log("data: " + JSON.stringify(data));
-
-       return data;
-   } catch (e) {
-       console.log(e);
-       throw Error('Error')
-   }
-}
+  
+      if (options === null) {
+        options = {
+          sort: {
+            schedule_time: 1 // Sort by schedule_time in ascending order
+          },
+          projection: {
+            creation_date: 0,
+            modified_date: 0,
+            operator_id: 0
+          }
+        };
+      }
+      options.limit = 1; // Limit the result to one document
+      console.log('options: ' + JSON.stringify(options));
+  
+      const data = await myDB.collection(COLLECTION_NAME).findOne(query, options)
+      console.log("data: " + JSON.stringify(data));
+  
+      return data;
+    } catch (e) {
+      console.log(e);
+      throw Error('Error');
+    }
+  }
+  
 exports.getById = async function (id, options = null) {
     // console.log('In getById');
     // console.log('id: ' + id);
@@ -224,7 +219,6 @@ exports.create = async function (input) {
     var now = new Date();
     input.created_date = now;
     input.modified_date = now;
-    input.status = 'created';
     input.previous_bowl_weight=0.0;
     input.final_bowl_weight=0.0;
     input.food_consumed = 0.0;
