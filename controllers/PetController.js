@@ -180,7 +180,8 @@ pythonScript.stdout.on('data', (data) => {
         const timeParts = newPetSchedule.timings[i].split(":");
         const hour = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);
-        targetTime.setHours(hour, minutes);
+        targetTime.setUTCHours(hour);
+        targetTime.setUTCMinutes(minutes);
       
       
         console.log('currentTime: ' + JSON.stringify(currentTime));

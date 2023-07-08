@@ -96,7 +96,7 @@ exports.getTodayFeeds = async function (pet_schedule_id, options = null) {
     console.log('pet_schedule_id: ' + pet_schedule_id);
    console.log('options: ' + JSON.stringify(options));
    const today = new Date();
-   today.setHours(0, 0, 0, 0);
+   today.setUTCHours(0, 0, 0, 0);
 
    try {
     const query = {
