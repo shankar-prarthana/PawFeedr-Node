@@ -474,7 +474,7 @@ exports.cancelFeed = async function (req, res, next) {
 
    
   
-    return res.status(200).send({ status: 'success', message:'Removed pet successfully!' });
+    return res.status(200).send({ status: 'success', message:'Cancelled feed successfully!' });
 }
 exports.updatePet = async function (req, res, next) {
     // console.log('In addPet');
