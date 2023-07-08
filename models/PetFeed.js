@@ -112,7 +112,7 @@ exports.getTodayFeeds = async function (pet_schedule_id, options = null) {
       };
     
       
-       // console.log('query: ' + JSON.stringify(query));
+        console.log('query: ' + JSON.stringify(query));
 
        if (options === null) {
            options = {
