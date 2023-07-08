@@ -670,7 +670,7 @@ var isFirstFeedProcessed = false
               }
 
             var newPetFeed = await PetFeedServices.create(newPetFeed);
-            console.log('newPetFeed: ' + JSON.stringify(newPet));
+            console.log('newPetFeed: ' + JSON.stringify(newPetFeed));
             if (newPetFeed == null) {
                 return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
             }
