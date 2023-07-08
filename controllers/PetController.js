@@ -628,7 +628,7 @@ pythonScript.stdout.on('data', (data) => {
    
     var petFeeds = await PetFeedServices.getTodayRemaining(updatePetSchedule._id);
     console.log('petFeeds: ' + JSON.stringify(petFeeds));
-    for (let i = 0; i < petFeeds.length(); i++) {
+    for (let i = 0; i < petFeeds.length; i++) {
     
                 var updatePetFeed = {
                 status: 'cancelled',
