@@ -101,7 +101,7 @@ exports.getTodayFeeds = async function (pet_schedule_id, options = null) {
    try {
     const query = {
         pet_schedule_id: new ObjectId(pet_schedule_id),
-        schedule_date: {
+        schedule_time: {
             $gte: today,
             $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // Add 24 hours to get the end of the day
           },
@@ -142,12 +142,12 @@ exports.getTodayFeedsNext = async function (pet_schedule_id, options = null) {
     console.log('pet_schedule_id: ' + pet_schedule_id);
    console.log('options: ' + JSON.stringify(options));
    const today = new Date();
-   today.setHours(0, 0, 0, 0);
+   today.setUTCHours(0, 0, 0, 0);
 
    try {
     const query = {
         pet_schedule_id: new ObjectId(pet_schedule_id),
-        schedule_date: {
+        schedule_time: {
             $gte: today,
             $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // Add 24 hours to get the end of the day
           },
