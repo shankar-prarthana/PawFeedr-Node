@@ -44,7 +44,7 @@ app.use(function (req, res, next) {
 
 // Middleware to set default timezone for all routes
 app.use(function (req, res, next) {
-  process.env.TZ = 'Asia/Calcutta'; // Set the desired timezone
+  process.env.TZ = 'Asia/Kolkata';
 
   // Continue processing the next middleware/route handler
   next();

@@ -27,7 +27,7 @@ router.use(bodyParser.json({ limit: '500mb' }));
 
 router.use(fileupload());
 router.use(function (req, res, next) {
-    process.env.TZ = 'Asia/Calcutta'; // Set the desired timezone
+  process.env.TZ = 'Asia/Kolkata';
   
     // Continue processing the next middleware/route handler
     next();
