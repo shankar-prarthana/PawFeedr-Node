@@ -166,23 +166,23 @@ pythonScript.stdout.on('data', (data) => {
         frequency: 3,
         timings: ["09:30", "13:00", "19:00"],
         operator_id: 'addPet',
-    };
-
-    var newPetSchedule = await PetSchedulesServices.create(newPetSchedule);
-    console.log('newPetSchedule: ' + JSON.stringify(newPet));
-    if (newPetSchedule == null) {
+      };
+      
+      var newPetSchedule = await PetSchedulesServices.create(newPetSchedule);
+      console.log('newPetSchedule: ' + JSON.stringify(newPetSchedule)); // Corrected variable name
+      if (newPetSchedule == null) {
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
-    }
-
-
-
-    for (let i = 0; i < newPetSchedule.frequency; i++) {
+      }
+      
+      for (let i = 0; i < newPetSchedule.frequency; i++) {
         const currentTime = new Date();
         const targetTime = new Date();
         const timeParts = newPetSchedule.timings[i].split(":");
         const hour = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);
         targetTime.setHours(hour, minutes);
+      }
+      
         console.log('currentTime: ' + JSON.stringify(currentTime));
         console.log('targetTime: ' + JSON.stringify(targetTime));
 
