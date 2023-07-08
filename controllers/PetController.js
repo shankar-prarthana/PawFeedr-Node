@@ -712,7 +712,7 @@ exports.updatePetSchedule = async function (req, res, next) {
     var updatePetSchedule = {
         portion: req.body.portion,
         frequency:parseInt(req.body.frequency),
-        timings:req.body.timings,
+        timings:req.body.timings.toArray(),
         operator_id: 'updatePetSchedule',
     };
 
