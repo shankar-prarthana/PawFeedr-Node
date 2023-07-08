@@ -49,10 +49,9 @@ exports.getHistory = async function (pet_schedule_id, options = null) {
     const query = {
         pet_schedule_id: new ObjectId(pet_schedule_id),
         modified_date: { $gte: weekAgo },
-        status: {
-          $ne: 'created',
-          $ne: 'upcoming'
-        }
+        status: $nin
+         [ 'created','upcoming']
+        
       };
     
       
