@@ -603,12 +603,18 @@ pythonScript.stdout.on('data', (data) => {
     console.log('updateFoodAmount: ' + JSON.stringify(updateFoodAmount));
     
 
-    var portion = 0.0;
+    var portion1 = 0.0;
     if (foodType.code == 'dry') {
-        portion = updateFoodAmount.dry_food_per_day / 3
+        portion1 = updateFoodAmount.dry_food_per_day / 3
+        console.log("in PORTION "+updateFoodAmount.dry_food_per_day );
+        console.log("in PORTION "+portion1);
+
     }
     else {
-        portion = updateFoodAmount.wet_food_per_day / 3
+        portion1 = updateFoodAmount.wet_food_per_day / 3
+        console.log("in PORTION "+portion1);
+        console.log("in PORTION "+updateFoodAmount.wet_food_per_day );
+
     }
     var petSchedule = await PetSchedulesServices.getByPetFoodAmountId(updateFoodAmount._id);
     console.log('petSchedule: ' + JSON.stringify(petSchedule));
@@ -618,7 +624,7 @@ pythonScript.stdout.on('data', (data) => {
     }
 
     var updatePetSchedule = {
-        portion: portion.toFixed(0),
+        portion: portion1.toFixed(0),
         operator_id: 'updatePet',
     };
 
