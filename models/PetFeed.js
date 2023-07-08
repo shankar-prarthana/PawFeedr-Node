@@ -211,7 +211,7 @@ exports.getTodayFeedsNext = async function(pet_schedule_id, options = null) {
       }
       console.log('options: ' + JSON.stringify(options));
   
-      const data = await myDB.collection(COLLECTION_NAME).find(query, options).toArray
+      const data = await myDB.collection(COLLECTION_NAME).find(query, options).toArray();
       console.log("data: " + JSON.stringify(data));
   
       return data;
