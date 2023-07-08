@@ -626,7 +626,7 @@ pythonScript.stdout.on('data', (data) => {
     var updatePetSchedule = await PetSchedulesServices.update(petSchedule._id,updatePetSchedule);
     console.log('updatePetSchedule: ' + JSON.stringify(updatePetSchedule));
    
-    var petFeeds = await PetFeedServices.getTodayFeedsNext(updatePetSchedule._id);
+    var petFeeds = await PetFeedServices.getTodayRemaining(updatePetSchedule._id);
     console.log('petFeeds: ' + JSON.stringify(petFeeds));
     for (let i = 0; i < petFeeds.length(); i++) {
     
@@ -639,14 +639,19 @@ pythonScript.stdout.on('data', (data) => {
             console.log('updatePetFeed: ' + JSON.stringify(updatePetFeed));
           
     }
+  
 
+var isFirstFeedProcessed = false
     for (let i = 0; i < updatePetSchedule.frequency; i++) {
         const currentTime = new Date();
         const targetTime = new Date();
-        const timeParts = updatePetSchedule.timings[i].split(":");
+        const timeParts = newPetSchedule.timings[i].split(":");
         const hour = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);
-        targetTime.setHours(hour, minutes);
+        targetTime.setUTCHours(hour);
+        targetTime.setUTCMinutes(minutes);
+      
+      
 
         if (currentTime < targetTime) {
             
@@ -657,12 +662,20 @@ pythonScript.stdout.on('data', (data) => {
                 schedule_time:targetTime,
                 operator_id: 'updatePet',
             };
+            if (!isFirstFeedProcessed) {
+                newPetFeed.status = "upcoming";
+              }
+              else{
+                newPetFeed.status = "created";
+              }
 
             var newPetFeed = await PetFeedServices.create(newPetFeed);
             console.log('newPetFeed: ' + JSON.stringify(newPet));
             if (newPetFeed == null) {
                 return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
             }
+            isFirstFeedProcessed=true;
+
         }
     }
 
