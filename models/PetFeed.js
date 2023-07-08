@@ -36,12 +36,15 @@ exports.getUpcoming = async function (pet_schedule_id, options = null) {
         throw Error('Error')
     }
 }
+
 exports.getHistory = async function (pet_schedule_id, options = null) {
     console.log('In getHistory');
     console.log('pet_schedule_id: ' + pet_schedule_id);
    console.log('options: ' + JSON.stringify(options));
    const weekAgo = new Date();
    weekAgo.setDate(weekAgo.getDate() - 7); 
+
+
    try {
     const query = {
         pet_schedule_id: new ObjectId(pet_schedule_id),
@@ -52,21 +55,8 @@ exports.getHistory = async function (pet_schedule_id, options = null) {
         }
       };
     
-      const pipeline = [
-        { $match: query },
-        {
-          $group: {
-            _id: {
-              $dateToString: {
-                format: '%Y-%m-%d',
-                date: '$schedule_date'
-              }
-            },
-            count: { $sum: 1 }
-          }
-        }
-      ];
-       // console.log('query: ' + JSON.stringify(query));
+      
+        console.log('query: ' + JSON.stringify(query));
 
        if (options === null) {
            options = {
@@ -81,7 +71,7 @@ exports.getHistory = async function (pet_schedule_id, options = null) {
        }
        console.log('options: ' + JSON.stringify(options));
 
-       const data = await myDB.collection(COLLECTION_NAME).aggregate(pipeline, options).toArray();
+       var data = await myDB.collection(COLLECTION_NAME).find(query, options).toArray();
        console.log("data: " + JSON.stringify(data));
 
        return data;
@@ -90,7 +80,6 @@ exports.getHistory = async function (pet_schedule_id, options = null) {
        throw Error('Error')
    }
 }
-
 exports.getTodayFeeds = async function (pet_schedule_id, options = null) {
     console.log('In getTodayFeeds');
     console.log('pet_schedule_id: ' + pet_schedule_id);
