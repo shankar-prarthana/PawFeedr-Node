@@ -449,7 +449,7 @@ exports.cancelFeed = async function (req, res, next) {
         status: "cancelled",
         operator_id: 'cancelFeed',
     };
-    var newPetFeed = await PetFeedServices.update(pet_feed_id._id,newPetFeed);
+    var newPetFeed = await PetFeedServices.update(petFeed._id,newPetFeed);
    
     
     return res.status(200).send({ status: 'success', message:'Removed pet successfully!' });
