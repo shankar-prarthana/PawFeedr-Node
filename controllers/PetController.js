@@ -352,7 +352,7 @@ exports.getPetHistory = async function (req, res, next) {
     }
     var PetHistory = await PetFeedServices.getHistory(PetSchedule._id);
     if (PetHistory == null) {
-       // console.log("in PetUpcoming");
+        console.log("in PetUpcoming");
     }
 
     return res.status(200).send({ status: 'success', pet: Pet, pet_history:PetHistory, message:'Got pet History successfully!' });
@@ -687,6 +687,94 @@ var isFirstFeedProcessed = false
 
 
     return res.status(200).send({ status: "success", pet: updatePet, pet_food_amount: updateFoodAmount, pet_schedule: updatePetSchedule, message: "Updated pet successfully!" });
+
+
+}
+
+exports.updatePetSchedule = async function (req, res, next) {
+    // console.log('In updatePetSchedule');
+    console.log('req.body: ' + JSON.stringify(req.body));
+    if ((req.body.pet_schedule_id == null) || (req.body.portion == null) || (req.body.frequency == null) || (req.body.timings == null) ) {
+
+        console.log("pet_schedule_id:" + req.body.pet_schedule_id + "portion:" + req.body.portion + "frequency:" + req.body.frequency + "timings:" + req.body.timings );
+        return res.status(200).send({ status: 403, message: 'Missing paramters' });
+
+    }
+ 
+   
+    var petSchedule = await PetSchedulesServices.getById(req.body.pet_schedule_id );
+    console.log('petSchedule: ' + JSON.stringify(petSchedule));
+    if (petSchedule == null) {
+        console.log("in petSchedule");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+
+    var updatePetSchedule = {
+        portion: req.body.portion,
+        frequency:parseInt(req.body.frequency),
+        timings:req.body.timings,
+        operator_id: 'updatePetSchedule',
+    };
+
+ 
+    var updatePetSchedule = await PetSchedulesServices.update(petSchedule._id,updatePetSchedule);
+    console.log('updatePetSchedule: ' + JSON.stringify(updatePetSchedule));
+   
+    var petFeeds = await PetFeedServices.getTodayRemaining(updatePetSchedule._id);
+    console.log('petFeeds: ' + JSON.stringify(petFeeds));
+    for (let i = 0; i < petFeeds.length; i++) {
+    
+                var updatePetFeed = {
+                status: 'cancelled',
+                operator_id: 'updatePet',
+            };
+
+            var updatePetFeed = await PetFeedServices.update(petFeeds[i]._id,updatePetFeed);
+            console.log('updatePetFeed: ' + JSON.stringify(updatePetFeed));
+          
+    }
+  
+
+var isFirstFeedProcessed = false
+    for (let i = 0; i < updatePetSchedule.frequency; i++) {
+        const currentTime = new Date();
+        const targetTime = new Date();
+        const timeParts = updatePetSchedule.timings[i].split(":");
+        const hour = parseInt(timeParts[0], 10);
+        const minutes = parseInt(timeParts[1], 10);
+        targetTime.setUTCHours(hour);
+        targetTime.setUTCMinutes(minutes);
+      
+      
+
+        if (currentTime < targetTime) {
+            
+            var newPetFeed = {
+                pet_schedule_id: updatePetSchedule._id,
+                timing:updatePetSchedule.timings[i],
+                amount: updatePetSchedule.portion,
+                schedule_time:targetTime,
+                operator_id: 'updatePet',
+            };
+            if (!isFirstFeedProcessed) {
+                newPetFeed.status = "upcoming";
+              }
+              else{
+                newPetFeed.status = "created";
+              }
+
+            var newPetFeed = await PetFeedServices.create(newPetFeed);
+            console.log('newPetFeed: ' + JSON.stringify(newPetFeed));
+            if (newPetFeed == null) {
+                return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+            }
+            isFirstFeedProcessed=true;
+
+        }
+    }
+
+
+    return res.status(200).send({ status: "success",  pet_schedule: updatePetSchedule, message: "Updated pet Schedule successfully!" });
 
 
 }

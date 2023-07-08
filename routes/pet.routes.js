@@ -42,5 +42,6 @@ router.post('/getProfile', PetController.getProfile);
 router.post('/removePet', PetController.removePet);
 router.post('/cancelFeed', PetController.cancelFeed);
 router.post('/updatePet', PetController.updatePet);
+router.post('/updatePetSchedule', PetController.updatePetSchedule);
 
 module.exports = router;
