@@ -536,7 +536,7 @@ exports.updatePet = async function (req, res, next) {
 
     };
     if (petType.code == "dog") {
-        newPet.activity_level_type_id = activityLevelType._id;
+        updatePet.activity_level_type_id = activityLevelType._id;
     }
 
     var updatePet = await PetsServices.update(existingPet._id,updatePet);
