@@ -739,7 +739,7 @@ var isFirstFeedProcessed = false
     for (let i = 0; i < updatePetSchedule.frequency; i++) {
         const currentTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
         const targetTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
-        const timeParts = updatePetSchedule.timings[i].split(":");
+        const timeParts = req.body.timings[i].split(":");
         const hour = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);
         targetTime.setUTCHours(hour);
@@ -751,8 +751,8 @@ var isFirstFeedProcessed = false
             
             var newPetFeed = {
                 pet_schedule_id: updatePetSchedule._id,
-                timing:updatePetSchedule.timings[i],
-                amount: updatePetSchedule.portion,
+                timing:req.body.timings[i],
+                amount: req.body.portion,
                 schedule_time:targetTime,
                 operator_id: 'updatePet',
             };
