@@ -1,6 +1,7 @@
 const COLLECTION_NAME = 'in_app_messages';
 
 var ObjectId = require('mongodb').ObjectId;
+const  moment  = require('moment');
 
 //UsersSessions_getByUser_id function
 
@@ -46,7 +47,7 @@ exports.getById = async function (_id, options = null) {
     try {
         const query = {
             _id: new ObjectId(_id),
-            expiration_date: { $gte: new Date() },
+            expiration_date: { $gte:moment.parseZone(new Date()).utcOffset("+05:30")._d },
 
 
         };

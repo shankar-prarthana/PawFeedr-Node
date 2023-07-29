@@ -1,5 +1,6 @@
 const COLLECTION_NAME = 'users';
 var ObjectId = require('mongodb').ObjectId;
+const  moment  = require('moment');
 
 exports.getByMobile = async function (mobile, options = null) {
      console.log('In getByMobile');
@@ -112,7 +113,7 @@ exports.create = async function (input) {
     // console.log('In create');
     // console.log('input: ' + JSON.stringify(input));
 
-    var now = new Date();
+    var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     input.created_date = now;
     input.modified_date = now;
     input.is_locked = false;
@@ -138,7 +139,7 @@ exports.update = async function (_id,input) {
     console.log('In create');
     console.log('input: ' + JSON.stringify(input));
 
-    input.modified_date = new Date();
+    input.modified_date = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     try {
         const query = {
             _id: new ObjectId(_id),

@@ -12,6 +12,7 @@ var UserNotificationServices = require('../models/UserNotification')
 var PetsServices = require('../models/Pets')
 var InAppMessagesServices = require('../models/InAppMessages')
 var TeleSignSDK = require('telesignsdk');
+const  moment  = require('moment');
 
 
 const crypto = require('crypto');
@@ -65,7 +66,7 @@ var sendOTPSMS = async function (input) {
 
 
 
-    var expiry = new Date(newMobileOTP.expiration_date);
+    var expiry = moment.parseZone(new Date(newMobileOTP.expiration_date)).utcOffset("+05:30")._d;
     const options = {
         weekday: 'short',
         year: 'numeric',
@@ -434,7 +435,7 @@ exports.loginUser = async function (req, res, next) {
     var updateUser = {
         unsuccessful_attempts: failed_attempts,
         is_locked: is_locked,
-        last_login_attempt: new Date(),
+        last_login_attempt: moment.parseZone(new Date()).utcOffset("+05:30")._d,
         operator_id: 'loginUser',
     };
     var updateUser = await UserService.update(existingUser._id, updateUser);

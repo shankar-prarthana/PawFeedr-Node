@@ -1,5 +1,6 @@
 const COLLECTION_NAME = 'pet_schedules';
 var ObjectId = require('mongodb').ObjectId;
+const  moment  = require('moment');
 
 exports.getByPetFoodAmountId = async function (pet_food_amount_id, options = null) {
      console.log('In getByPetFoodAmountId');
@@ -75,7 +76,7 @@ exports.create = async function (input) {
     // console.log('In create');
     // console.log('input: ' + JSON.stringify(input));
 
-    var now = new Date();
+    var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     input.created_date = now;
     input.modified_date = now;
     input.is_active = true;
@@ -97,7 +98,7 @@ exports.update = async function (_id,input) {
     console.log('In create');
     console.log('input: ' + JSON.stringify(input));
 
-    input.modified_date = new Date();
+    input.modified_date = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     try {
         const query = {
             _id: new ObjectId(_id),

@@ -1,5 +1,6 @@
 const COLLECTION_NAME = 'user_credentials';
 var ObjectId = require('mongodb').ObjectId;
+const  moment  = require('moment');
 
 exports.getByUser_id = async function (user_id, options = null) {
     // console.log('In getByUser_id');
@@ -105,7 +106,7 @@ exports.expire = async function (input) {
     // console.log('In expire');
     //console.log('input: ' + JSON.stringify(input));
 
-    var now = new Date();
+    var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     
     try {
         const query = {

@@ -2,6 +2,7 @@ const COLLECTION_NAME = 'mobile_otps';
 var RefOTPTypesService = require('../models/refOTPTypes');
 
 var ObjectId = require('mongodb').ObjectId;
+const  moment  = require('moment');
 
 //UsersSessions_getByUser_id function
 
@@ -9,13 +10,13 @@ exports.getByMobileNotificationTypeId = async function (mobile,notification_type
      console.log('In getByMobile');
     // console.log('mobile: ' + mobile);
     // console.log('options: ' + JSON.stringify(options));
-    var currentDate = new Date();
+    var currentDate = moment.parseZone(new Date()).utcOffset("+05:30")._d;
 
     try {
         const query = {
             mobile: mobile,
             notification_type_id: new ObjectId(notification_type_id),
-            expiration_date: { $gt: new Date() },       
+            expiration_date: { $gt: moment.parseZone(new Date()).utcOffset("+05:30")._d },       
          };
          console.log('query: ' + JSON.stringify(query));
 
@@ -48,7 +49,7 @@ exports.getById = async function (_id, options = null) {
     try {
         const query = {
             _id: new ObjectId(_id),
-            expiration_date: { $gte: new Date() },
+            expiration_date: { $gte:moment.parseZone(new Date()).utcOffset("+05:30")._d },
 
         };
         // console.log('query: ' + JSON.stringify(query));
@@ -93,8 +94,8 @@ exports.create = async function (input) {
       }
       const otp = generateOTP(otpType.length);
 
-    var now = new Date();
-    var expiry = new Date();
+    var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
+    var expiry = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     expiry.setMinutes(expiry.getMinutes() + otpType.expiration_interval);
      console.log('now: ' + now);
      console.log('expiry: ' + expiry);
@@ -128,7 +129,7 @@ exports.expire = async function (input) {
      console.log('In expire');
     console.log('input: ' + JSON.stringify(input));
 
-    var now = new Date();
+    var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     
     try {
         const query = {

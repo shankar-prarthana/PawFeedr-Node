@@ -15,7 +15,7 @@ const path = require('path');
 const fileDogPath = path.join(__dirname, '..', 'assets', 'dog.py');
 const fileCatPath = path.join(__dirname, '..', 'assets', 'cat.py');
 
-
+const  moment  = require('moment');
 const { spawn } = require('child_process');
 
 exports.addPet = async function (req, res, next) {
@@ -176,8 +176,8 @@ pythonScript.stdout.on('data', (data) => {
       var isFirstFeedProcessed = false;
       
       for (let i = 0; i < newPetSchedule.frequency; i++) {
-        const currentTime = new Date();
-        const targetTime = new Date();
+        const currentTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
+        const targetTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
         const timeParts = newPetSchedule.timings[i].split(":");
         const hour = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);
@@ -649,8 +649,8 @@ pythonScript.stdout.on('data', (data) => {
 
 var isFirstFeedProcessed = false
     for (let i = 0; i < updatePetSchedule.frequency; i++) {
-        const currentTime = new Date();
-        const targetTime = new Date();
+        const currentTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
+        const targetTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
         const timeParts = updatePetSchedule.timings[i].split(":");
         const hour = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);
@@ -737,8 +737,8 @@ exports.updatePetSchedule = async function (req, res, next) {
 
 var isFirstFeedProcessed = false
     for (let i = 0; i < updatePetSchedule.frequency; i++) {
-        const currentTime = new Date();
-        const targetTime = new Date();
+        const currentTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
+        const targetTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
         const timeParts = updatePetSchedule.timings[i].split(":");
         const hour = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);

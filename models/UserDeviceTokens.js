@@ -1,6 +1,7 @@
 const COLLECTION_NAME = 'user_device_tokens';
 
 var ObjectId = require('mongodb').ObjectId;
+const  moment  = require('moment');
 
 //UsersSessions_getByUser_id function
 
@@ -12,7 +13,7 @@ exports.getByUserId = async function (user_id, options = null) {
     try {
         const query = {
             user_id: new ObjectId(user_id),
-            expiration_date: { $gte: new Date() },
+            expiration_date: { $gte: moment.parseZone(new Date()).utcOffset("+05:30")._d },
         };
         // console.log('query: ' + JSON.stringify(query));
 
@@ -45,7 +46,7 @@ exports.getById = async function (_id, options = null) {
     try {
         const query = {
             _id: new ObjectId(_id),
-            expiration_date :{ $gte : new Date() },
+            expiration_date :{ $gte :moment.parseZone(new Date()).utcOffset("+05:30")._d },
 
 
         };
@@ -82,8 +83,8 @@ exports.create = async function (input) {
         await this.expire(expire_input);
     
 
-    var now = new Date();
-    var expiry = new Date(now);
+    var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
+    var expiry =moment.parseZone(new Date()).utcOffset("+05:30")._d;
     expiry.setFullYear(expiry.getFullYear() + 1);
     // console.log('now: ' + now);
     // console.log('expiry: ' + expiry);
@@ -118,7 +119,7 @@ exports.expire = async function (input) {
     // console.log('In create');
     //console.log('input: ' + JSON.stringify(input));
 
-    var now = new Date();
+    var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     
     try {
         const query = {

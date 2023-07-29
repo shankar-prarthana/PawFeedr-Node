@@ -2,6 +2,7 @@ const COLLECTION_NAME = 'user_sessions';
 var refSessionTypesService = require('../models/refSessionTypes');
 
 var ObjectId = require('mongodb').ObjectId;
+const  moment  = require('moment');
 
 //UsersSessions_getByUser_id function
 

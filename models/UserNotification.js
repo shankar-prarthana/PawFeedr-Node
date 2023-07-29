@@ -1,5 +1,6 @@
 const COLLECTION_NAME = 'user_notifications';
 var ObjectId = require('mongodb').ObjectId;
+const  moment  = require('moment');
 
 exports.getAllByUserId = async function (user_id, options = null) {
     //  console.log('In getByUserId');
@@ -141,7 +142,7 @@ exports.create = async function (input) {
      console.log('In create');
      console.log('input: ' + JSON.stringify(input));
 
-    var now = new Date();
+    var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     input.is_on = true;
     input.created_date = now;
     input.modified_date = now;
@@ -164,7 +165,7 @@ exports.update = async function (_id,bool,input) {
     console.log('In create');
     console.log('input: ' + JSON.stringify(input));
 
-    var now = new Date();
+    var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     try {
         const query = {
             _id: new ObjectId(_id),
