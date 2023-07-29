@@ -8,6 +8,7 @@ var RefCommunicationChannelServices = require('../models/refCommunicationChannel
 var MobileOTPsService = require('../models/MobileOTPs');
 var MobileMessagesService = require('../models/MobileMessages');
 var UserDeviceTokensService = require('../models/UserDeviceTokens')
+var UserArduinoDeviceService = require('../models/UserArduinoDevice')
 var UserNotificationServices = require('../models/UserNotification')
 var PetsServices = require('../models/Pets')
 var InAppMessagesServices = require('../models/InAppMessages')
@@ -536,6 +537,43 @@ exports.saveUserDeviceToken = async function (req, res, next) {
 
 
 }
+
+exports.saveArduinoDevice = async function (req, res, next) {
+    // console.log('In saveDeviceCode');
+    console.log('req.body: ' + JSON.stringify(req.body));
+    if ((req.body.user_id == null) || (req.body.ssid == null)|| (req.body.ip_add == null)|| (req.body.wifi_ssid == null)|| (req.body.wifi_ip == null)|| (req.body.wifi_password == null)) {
+
+        console.log("user_id:" + req.body.user_id + "ssid:" + req.body.ssid  + "ip_add:" + req.body.ip_add);
+        return res.status(200).send({ status: 403, message: 'Missing paramters' });
+
+    }
+    var existingUser = await UserService.getById(req.body.user_id);
+    if (existingUser == null) {
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+    }
+
+    var newUserArduinoDevice = {
+        user_id: existingUser._id,
+        ssid: req.body.ssid,
+        ip_add:req.body.ip_add,
+        wifi_ssid: req.body.wifi_ssid,
+        wifi_ip:req.body.wifi_ip,
+        wifi_password:req.body.wifi_password,
+        operator_id: 'saveArduinoDevice'
+       };
+
+    var newUserArduinoDevice = await UserArduinoDeviceService.create(newUserArduinoDevice);
+    console.log('newUserArduinoDevice: ' + JSON.stringify(newUserArduinoDevice));
+    if (newUserArduinoDevice == null) {
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+    }
+    return res.status(200).send({ status: "success", user_arduino_device: newUserArduinoDevice, message: "Saved user arduino device successfully" });
+
+
+}
+
+
+
 
 exports.sendInAppNotification = async function (req, res, next) {
     console.log('req.body: ' + JSON.stringify(req.body));
