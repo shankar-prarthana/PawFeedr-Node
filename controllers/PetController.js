@@ -8,6 +8,7 @@ var PetFoodAmountsService = require('../models/PetFoodAmounts');
 var PetSchedulesServices = require('../models/PetSchedule');
 var PetFeedServices = require('../models/PetFeed');
 var UserSessionServices = require('../models/UserSessions');
+var UserArduinoDeviceService = require('../models/UserArduinoDevice')
 var UserService = require('../models/Users');
 const path = require('path');
 
@@ -237,7 +238,11 @@ exports.getPet = async function (req, res, next) {
     if (Pet == null) {
         console.log("in PetsServices");
     }
-    return res.status(200).send({ status: 'success', pet: Pet,isPet:Pet!=null, message:'Got pet successfully!' });
+    var ArduinoDevice = await UserArduinoDeviceService.getByUserId(existingUser._id);
+    if (ArduinoDevice == null) {
+        console.log("in UserArduinoDeviceService");
+    }
+    return res.status(200).send({ status: 'success', pet: Pet,isPet:Pet!=null,device: ArduinoDevice,isDevice:ArduinoDevice!=null, message:'Got pet successfully!' });
 }
 
 exports.getPetSchedule = async function (req, res, next) {
