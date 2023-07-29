@@ -41,7 +41,7 @@ exports.getHistory = async function (pet_schedule_id, options = null) {
     console.log('In getHistory');
     console.log('pet_schedule_id: ' + pet_schedule_id);
    console.log('options: ' + JSON.stringify(options));
-   const weekAgo = new Date();
+   const weekAgo = moment.parseZone(new Date()).utcOffset("+05:30")._d;
    weekAgo.setDate(weekAgo.getDate() - 7); 
 
 
@@ -80,7 +80,7 @@ exports.getTodayFeeds = async function (pet_schedule_id, options = null) {
     console.log('In getTodayFeeds');
     console.log('pet_schedule_id: ' + pet_schedule_id);
    console.log('options: ' + JSON.stringify(options));
-   const today = new Date();
+   const today = moment.parseZone(new Date()).utcOffset("+05:30")._d;
    today.setUTCHours(0, 0, 0, 0);
 
    try {
@@ -88,7 +88,7 @@ exports.getTodayFeeds = async function (pet_schedule_id, options = null) {
         pet_schedule_id: new ObjectId(pet_schedule_id),
         schedule_time: {
             $gte: today,
-            $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // Add 24 hours to get the end of the day
+            $lt: moment.parseZone(new Date(today.getTime() + 24 * 60 * 60 * 1000)).utcOffset("+05:30")._d   // Add 24 hours to get the end of the day
           },
           status: {
             $ne: 'expired'
@@ -127,7 +127,7 @@ exports.getTodayFeedsNext = async function(pet_schedule_id, options = null) {
     console.log('pet_schedule_id: ' + pet_schedule_id);
     console.log('options: ' + JSON.stringify(options));
   
-    const currentTime = new Date();
+    const currentTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
   
     try {
       const query = {
@@ -170,7 +170,7 @@ exports.getTodayFeedsNext = async function(pet_schedule_id, options = null) {
     console.log('pet_schedule_id: ' + pet_schedule_id);
     console.log('options: ' + JSON.stringify(options));
   
-    const currentTime = new Date();
+    const currentTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
   
     try {
       const query = {
@@ -243,7 +243,7 @@ exports.create = async function (input) {
      console.log('In create');
     // console.log('input: ' + JSON.stringify(input));
 
-    var now = new Date();
+    var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     input.created_date = now;
     input.modified_date = now;
     input.previous_bowl_weight=0.0;
@@ -268,7 +268,7 @@ exports.update = async function (_id,input) {
     console.log('In create');
     console.log('input: ' + JSON.stringify(input));
 
-    input.modified_date = new Date();
+    input.modified_date = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     try {
         const query = {
             _id: new ObjectId(_id),

@@ -13,7 +13,7 @@ exports.getByUserDeviceIdNotficationTypeId = async function (user_device_id,notf
         const query = {
             user_device_id: new ObjectId(user_device_id),
             notfication_type_id: new ObjectId(notfication_type_id),
-            expiration_date: { $gte: new Date() },
+            expiration_date: { $gte: moment.parseZone(new Date()).utcOffset("+05:30")._d },
         };
         // console.log('query: ' + JSON.stringify(query));
 
@@ -80,8 +80,8 @@ exports.create = async function (input) {
      console.log('input: ' + JSON.stringify(input));
 
    
-    var now = new Date();
-    var expiry = new Date(now);
+    var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
+    var expiry = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     expiry.setMinutes(expiry.getMinutes() + 15);
      console.log('now: ' + now);
      console.log('expiry: ' + expiry);

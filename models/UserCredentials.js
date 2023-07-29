@@ -9,7 +9,7 @@ exports.getByUser_id = async function (user_id, options = null) {
     try {
         const query = {
             user_id: user_id,
-            expiration_date :{ $gte : new Date() },
+            expiration_date :{ $gte :moment.parseZone(new Date()).utcOffset("+05:30")._d },
         };
         // console.log('query: ' + JSON.stringify(query));
 
@@ -44,7 +44,7 @@ exports.getById = async function (id, options = null) {
     try {
         const query = {
             _id: new ObjectId(id),
-            expiration_date :{ $gte : new Date() },
+            expiration_date :{ $gte :moment.parseZone(new Date()).utcOffset("+05:30")._d },
 
         };
         // console.log('query: ' + JSON.stringify(query));
@@ -77,13 +77,13 @@ exports.create = async function (input) {
     // console.log('In create');
     // console.log('input: ' + JSON.stringify(input));
 
-    var now = new Date();
+    var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     console.log("now"+now);
     console.log("now year"+now.getFullYear());
     var year = now.getFullYear();
     var month = now.getMonth();
     var day = now.getDate();
-    var year_after = new Date(year + 1, month, day);
+    var year_after = moment.parseZone(new Date(year + 1, month, day)).utcOffset("+05:30")._d ;
     console.log("now year_after"+year_after);
 
     input.expiration_date = year_after;
