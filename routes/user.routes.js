@@ -46,5 +46,7 @@ router.post('/changeMobile', UserController.changeMobile);
 router.post('/getUserNotification', UserController.getUserNotification);
 router.post('/updateUser', UserController.updateUser);
 router.post('/updateUserNotification', UserController.updateUserNotification);
+router.post('/saveArduinoDevice', UserController.saveArduinoDevice);
+
 
 module.exports = router;
