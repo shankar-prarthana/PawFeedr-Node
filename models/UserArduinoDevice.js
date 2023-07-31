@@ -116,8 +116,8 @@ exports.create = async function (input) {
 }
 
 exports.expire = async function (input) {
-    // console.log('In create');
-    //console.log('input: ' + JSON.stringify(input));
+    console.log('In expire');
+    console.log('input: ' + JSON.stringify(input));
 
     var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     
@@ -125,7 +125,7 @@ exports.expire = async function (input) {
         const query = {
             user_id: new ObjectId(input.user_id),
         };
-        // console.log('query: ' + JSON.stringify(query));
+         console.log('query: ' + JSON.stringify(query));
 
         const newset = {
             $set: {
@@ -134,10 +134,10 @@ exports.expire = async function (input) {
                 operator_id:"expire"
             },
         };
-        // console.log('newset: ' + JSON.stringify(newset));
+        console.log('newset: ' + JSON.stringify(newset));
 
         var data = await myDB.collection(COLLECTION_NAME).updateMany(query, newset, { returnOriginal: false });
-       // console.log("data: " + JSON.stringify(data));
+     console.log("data: " + JSON.stringify(data));
 
         return data.value;
     } catch (e) {
