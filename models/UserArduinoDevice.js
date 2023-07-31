@@ -115,15 +115,15 @@ exports.create = async function (input) {
     }
 }
 
-exports.expire = async function (input) {
+exports.expire = async function (user_id) {
     console.log('In expire');
-    console.log('input: ' + JSON.stringify(input));
+    console.log('input: ' + JSON.stringify(user_id));
 
     var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
     
     try {
         const query = {
-            user_id: new ObjectId(input.user_id),
+            user_id: new ObjectId(user_id),
         };
          console.log('query: ' + JSON.stringify(query));
 
