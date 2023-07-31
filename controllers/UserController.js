@@ -10,7 +10,6 @@ var MobileMessagesService = require('../models/MobileMessages');
 var UserDeviceTokensService = require('../models/UserDeviceTokens')
 var UserArduinoDeviceService = require('../models/UserArduinoDevice')
 var UserNotificationServices = require('../models/UserNotification')
-var PetsServices = require('../models/Pets')
 var InAppMessagesServices = require('../models/InAppMessages')
 var TeleSignSDK = require('telesignsdk');
 const  moment  = require('moment');
@@ -837,7 +836,7 @@ exports.getArduinoDevice = async function (req, res, next) {
     return res.status(200).send({ status: 'success', user_arduino_device: UserArduinoDevice, message:'Got User Arduino device successfully!' });
 }
 
-exports.removeUserArduinoDevice = async function (req, res, next) {
+exports.removeArduinoDevice = async function (req, res, next) {
     // console.log('In updateUserNotification');
     if ((req.body.user_id == null)) {
 
