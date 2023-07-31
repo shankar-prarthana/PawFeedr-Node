@@ -38,6 +38,35 @@ exports.getByMobile = async function (mobile, options = null) {
         throw Error('Error')
     }
 }
+exports.getAllUsers = async function (req, res, next) {
+    // console.log('In getAllCountries');
+    try {
+        const query = {
+            is_active: true,
+        };
+        // console.log('query: ' + JSON.stringify(query));
+
+        if (options === null) {
+            options = {
+                projection: {
+                    is_active: 0,
+                    creation_date: 0,
+                    modified_date: 0,
+                    operator_id: 0,
+                },
+            };
+        }
+        // console.log('options: ' + JSON.stringify(options));
+
+        var data = await myDB.collection(COLLECTION_NAME).findOne(query, options);
+        // console.log("data: " + JSON.stringify(data));
+
+        return data;
+    } catch (e) {
+        console.log(e);
+        throw Error('Error')
+    }
+}
 
 exports.getById = async function (id, options = null) {
     // console.log('In getById');

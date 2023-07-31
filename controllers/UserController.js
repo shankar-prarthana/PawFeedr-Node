@@ -533,7 +533,7 @@ exports.saveUserDeviceToken = async function (req, res, next) {
     if (newUserDeviceToken == null) {
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
     }
-    return res.status(200).send({ status: "success", user_device_token: newUserDeviceToken, message: "Saved user dvice successfully" });
+    return res.status(200).send({ status: "success", user_device_token: newUserDeviceToken, message: "Saved user device successfully" });
 
 
 }
@@ -810,4 +810,56 @@ exports.updateUserNotification = async function (req, res, next) {
 
    UserNotification = await UserNotificationServices.update(UserNotification._id,req.body.is_on)
     return res.status(200).send({ status: 'success', user_notifications: UserNotification, message:'Updated Notfications successfully!' });
+}
+
+exports.getArduinoDevice = async function (req, res, next) {
+    // console.log('In getAllCountries');
+    if ((req.body.user_id == null)) {
+
+        console.log("user_id:" + req.body.user_id );
+        return res.status(200).send({ status: 403, message: 'Missing paramters' });
+
+    }
+    var existingUser = await UserService.getById(req.body.user_id);
+    if (existingUser == null) {
+        console.log("in UserService");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+    var UserArduinoDevice = await UserArduinoDeviceService.getByUserId(existingUser._id);
+    console.log("UserArduinoDevice"+UserArduinoDevice);
+
+    if (UserArduinoDevice == null) {
+        console.log("in UserArduinoDevice");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+
+   
+    return res.status(200).send({ status: 'success', user_arduino_device: UserArduinoDevice, message:'Got User Arduino device successfully!' });
+}
+
+exports.removeUserArduinoDevice = async function (req, res, next) {
+    // console.log('In updateUserNotification');
+    if ((req.body.user_id == null)) {
+
+        console.log("user_id:" + req.body.user_id );
+        return res.status(200).send({ status: 403, message: 'Missing paramters' });
+
+    }
+    var existingUser = await UserService.getById(req.body.user_id);
+    if (existingUser == null) {
+        console.log("in UserService");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+   
+
+    var UserArduinoDevice = await UserArduinoDeviceService.getByUserId(existingUser._id);
+    console.log("UserArduinoDevice"+UserArduinoDevice);
+
+    if (UserArduinoDevice == null) {
+        console.log("in UserArduinoDevice");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+
+    UserArduinoDevice = await UserArduinoDeviceService.expire(existingUser._id)
+    return res.status(200).send({ status: 'success',  message:'Updated Notfications successfully!' });
 }

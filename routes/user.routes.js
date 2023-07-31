@@ -47,6 +47,8 @@ router.post('/getUserNotification', UserController.getUserNotification);
 router.post('/updateUser', UserController.updateUser);
 router.post('/updateUserNotification', UserController.updateUserNotification);
 router.post('/saveArduinoDevice', UserController.saveArduinoDevice);
+router.post('/getArduinoDevice', UserController.getArduinoDevice);
+router.post('/removeArduinoDevice', UserController.removeArduinoDevice);
 
 
 module.exports = router;

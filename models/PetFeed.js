@@ -250,6 +250,7 @@ exports.create = async function (input) {
     input.previous_bowl_weight=0.0;
     input.final_bowl_weight=0.0;
     input.food_consumed = 0.0;
+    input.feed_time= null;
 
 
 

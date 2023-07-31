@@ -11,6 +11,8 @@ var UserSessionServices = require('../models/UserSessions');
 var UserArduinoDeviceService = require('../models/UserArduinoDevice')
 var UserService = require('../models/Users');
 const path = require('path');
+var PetBowlWeightServices = require('../models/PetBowlWeight')
+
 
 // Assuming your `dog.py` file is located in the `assets` directory within the project
 const fileDogPath = path.join(__dirname, '..', 'assets', 'dog.py');
@@ -244,7 +246,6 @@ exports.getPet = async function (req, res, next) {
     }
     return res.status(200).send({ status: 'success', pet: Pet,isPet:Pet!=null,device: ArduinoDevice,isDevice:ArduinoDevice!=null, message:'Got pet successfully!' });
 }
-
 exports.getPetSchedule = async function (req, res, next) {
     // console.log('In getAllCountries');
     // console.log('req.body: ' + JSON.stringify(req.body));
@@ -285,7 +286,6 @@ exports.getPetSchedule = async function (req, res, next) {
 
     return res.status(200).send({ status: 'success', pet: Pet,pet_food_amount:PetFoodAmount,pet_schedule:PetSchedule, pet_feeds:PetFeeds, message:'Got pet schedule successfully!' });
 }
-
 exports.getPetHome = async function (req, res, next) {
     // console.log('In getAllCountries');
     if ((req.body.user_id == null)) {
@@ -321,10 +321,13 @@ exports.getPetHome = async function (req, res, next) {
     if (PetUpcoming == null) {
         console.log("in PetUpcoming");
     }
+    var PetBowlWeight = await PetBowlWeightServices.getLastBowlWeightByPetId(Pet._id);
+    if (PetBowlWeight == null) {
+        console.log("in PetUpcoming");
+    }
 
-    return res.status(200).send({ status: 'success', pet: Pet, pet_upcoming:PetUpcoming, message:'Got pet home successfully!' });
+    return res.status(200).send({ status: 'success', pet: Pet, pet_upcoming:PetUpcoming,pet_bowl_weight:PetBowlWeight, message:'Got pet home successfully!' });
 }
-
 exports.getPetHistory = async function (req, res, next) {
     // console.log('In getAllCountries');
     if ((req.body.user_id == null)) {
@@ -362,7 +365,6 @@ exports.getPetHistory = async function (req, res, next) {
 
     return res.status(200).send({ status: 'success', pet: Pet, pet_history:PetHistory, message:'Got pet History successfully!' });
 }
-
 exports.getProfile = async function (req, res, next) {
     // console.log('In getAllCountries');
     if ((req.body.user_id == null)) {
@@ -419,8 +421,6 @@ exports.getProfile = async function (req, res, next) {
     }
     return res.status(200).send({ status: 'success', pet: Pet,user:existingUser, message:'Got pet History successfully!' });
 }
-
-
 exports.removePet = async function (req, res, next) {
     // console.log('In getAllCountries');
     if ((req.body.pet_id == null)) {
@@ -445,7 +445,6 @@ exports.removePet = async function (req, res, next) {
     
     return res.status(200).send({ status: 'success', message:'Removed pet successfully!' });
 }
-
 exports.cancelFeed = async function (req, res, next) {
     // console.log('In getAllCountries');
     if ((req.body.pet_feed_id == null)) {
@@ -695,7 +694,6 @@ var isFirstFeedProcessed = false
 
 
 }
-
 exports.updatePetSchedule = async function (req, res, next) {
     // console.log('In updatePetSchedule');
     console.log('req.body: ' + JSON.stringify(req.body));
@@ -783,3 +781,105 @@ var isFirstFeedProcessed = false
 
 
 }
+exports.updateBowlWeight = async function (req, res, next) {
+    // console.log('In saveDeviceCode');
+    console.log('req.body: ' + JSON.stringify(req.body));
+    if ((req.body.user_id == null) || (req.body.bowl_weight == null)) {
+
+        console.log("user_id:" + req.body.user_id + "bowl_weight:" + req.body.bowl_weight);
+        return res.status(200).send({ status: 403, message: 'Missing paramters' });
+
+    }
+    var existingUser = await UserService.getById(req.body.user_id);
+    if (existingUser == null) {
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+    }
+    var Pet = await PetsServices.getByUserId(req.body.user_id);
+    if (Pet == null) {
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+    }
+
+    var newBowlWeight = {
+        pet_id: Pet._id,
+        bowl_weight: req.body.bowl_weight,
+        operator_id: 'updateBowlWeight',
+    };
+
+    var newBowlWeight = await PetBowlWeightServices.create(newBowlWeight);
+    console.log('newBowlWeight: ' + JSON.stringify(newBowlWeight));
+    if (newBowlWeight == null) {
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+    }
+    return res.status(200).send({ status: "success", bowl_weight: newBowlWeight, message: "Updated pet bowl weight successfully" });
+
+
+}
+exports.updatePetFeed = async function (req, res, next) {
+    // console.log('In updatePetSchedule');
+    console.log('req.body: ' + JSON.stringify(req.body));
+    if ((req.body.user_id == null) || (req.body.status == null) || (req.body.final_bowl_weight == null) || (req.body.previous_bowl_weight == null)|| (req.body.feed_time == null) ) {
+
+        console.log("user_id:" + req.body.user_id + "status:" + req.body.status + "final_bowl_weight:" + req.body.final_bowl_weight + "previous_bowl_weight:" + req.body.previous_bowl_weight + "feed_time:" + req.body.feed_time );
+        return res.status(200).send({ status: 403, message: 'Missing paramters' });
+
+    }
+    var existingUser = await UserService.getById(req.body.user_id);
+    if (existingUser == null) {
+        console.log("in existingUser");
+
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+    }
+    var pet = await PetsServices.getByUserId(req.body.user_id);
+    if (pet == null) {
+        console.log("in PetsServices");
+
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+    }
+    var PetFoodAmount = await PetFoodAmountsService.getByPetId(pet._id);
+    if (PetFoodAmount == null) {
+        console.log("in PetFoodAmountsService");
+
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+    }
+   
+    var petSchedule = await PetSchedulesServices.getByPetFoodAmountId(PetFoodAmount._id );
+    console.log('petSchedule: ' + JSON.stringify(petSchedule));
+    if (petSchedule == null) {
+        console.log("in petSchedule");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+
+
+    var petUpcomingFeed= await PetFeedServices.getUpcoming(petSchedule._id);
+    if (petUpcomingFeed == null) {
+        console.log("in PetFeedServices");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+    
+    var newPetFeed = {
+        status: req.body.final_bowl_weight,
+        final_bowl_weight: req.body.final_bowl_weight,
+        previous_bowl_weight: req.body.previous_bowl_weight,
+        feed_time: req.body.feed_time,
+        operator_id: 'updatePetFeed',
+    };
+
+   
+    var newPetFeed = await PetFeedServices.update(petUpcomingFeed._id,newPetFeed);
+
+   var petNextFeed = await PetFeedServices.getTodayFeedsNext(petUpcomingFeed.pet_schedule_id);
+    if (petNextFeed != null) {
+        var updateNextFeed = {
+            status: "upcoming",
+            operator_id: 'updatePetFeed',
+        };   
+        var updateNextFeed = await PetFeedServices.update(petNextFeed._id,updateNextFeed);
+
+    }
+
+
+    return res.status(200).send({ status: "success",  pet_feed: newPetFeed, message: "Updated pet Feed successfully!" });
+
+
+}
+
