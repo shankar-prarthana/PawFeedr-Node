@@ -829,7 +829,7 @@ exports.getArduinoDevice = async function (req, res, next) {
 
     if (UserArduinoDevice == null) {
         console.log("in UserArduinoDevice");
-        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+        return res.status(200).send({ status: 403, message: 'Looks like you have not added a device.' });
     }
 
    
