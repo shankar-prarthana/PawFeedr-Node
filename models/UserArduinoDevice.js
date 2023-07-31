@@ -15,7 +15,7 @@ exports.getByUserId = async function (user_id, options = null) {
             user_id: new ObjectId(user_id),
             expiration_date: { $gte: moment.parseZone(new Date()).utcOffset("+05:30")._d },
         };
-        // console.log('query: ' + JSON.stringify(query));
+         console.log('query: ' + JSON.stringify(query));
 
         if (options === null) {
             options = {
