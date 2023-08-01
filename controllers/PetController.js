@@ -326,7 +326,7 @@ exports.getPetHome = async function (req, res, next) {
         console.log("in PetUpcoming");
     }
 
-    return res.status(200).send({ status: 'success', pet: Pet, pet_upcoming:PetUpcoming,pet_bowl_weight:PetBowlWeight, message:'Got pet home successfully!' });
+    return res.status(200).send({ status: 'success', user:existingUser, pet: Pet, pet_schedule:PetSchedule,pet_bowl_weight:PetBowlWeight, message:'Got pet home successfully!' });
 }
 exports.getPetHistory = async function (req, res, next) {
     // console.log('In getAllCountries');
