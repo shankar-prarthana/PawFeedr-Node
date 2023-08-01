@@ -325,8 +325,13 @@ exports.getPetHome = async function (req, res, next) {
     if (PetBowlWeight == null) {
         console.log("in PetUpcoming");
     }
-
-    return res.status(200).send({ status: 'success', user:existingUser, pet: Pet, pet_schedule:PetSchedule,pet_bowl_weight:PetBowlWeight, message:'Got pet home successfully!' });
+    var PetFeeds = await PetFeedServices.getTodayFeeds(PetSchedule._id);
+    if (PetFeeds == null) {
+        console.log("in PetFeed");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
+    console.log("");
+    return res.status(200).send({ status: 'success', user:existingUser, pet: Pet, pet_feeds:PetFeeds, pet_bowl_weight:PetBowlWeight, message:'Got pet home successfully!' });
 }
 exports.getPetHistory = async function (req, res, next) {
     // console.log('In getAllCountries');
