@@ -772,7 +772,7 @@ exports.updatePetSchedule = async function (req, res, next) {
  
     var updatedPetSchedule = await PetSchedulesServices.update(petSchedule._id,updatePetSchedule);
     console.log('updatedPetSchedule: ' + JSON.stringify(updatedPetSchedule));
-   
+
     var petFeeds = await PetFeedServices.getTodayRemaining(updatedPetSchedule._id);
     console.log('petFeeds: ' + JSON.stringify(petFeeds));
     for (let i = 0; i < petFeeds.length; i++) {
@@ -826,6 +826,7 @@ var isFirstFeedProcessed = false
         }
     }
 
+    console.log('updatedPetSchedule: ' + JSON.stringify(updatedPetSchedule));
 
     return res.status(200).send({ status: "success",  pet_schedule: updatedPetSchedule, message: "Updated pet Schedule successfully!" });
 
