@@ -119,12 +119,12 @@ var uint8arrayToString = function(data){
 
 
 pythonScript.stdout.on('data', (data) => {
-    console.log('TESTT OUTPUT 1 : ' + JSON.stringify(    data   ));
 
-    const result = data.toString().trim(); // Convert data to string and remove leading/trailing whitespaces
+    const result = data.toString().trim(); // Convert data buffer to string and remove leading/trailing whitespaces
     output = result.split('\n'); // Split the result on newline characters
+
+    console.log('TESTT OUTPUT2 : ' + JSON.stringify(output));
   });
-  console.log('TESTT OUTPUT2 : ' + JSON.stringify(    output   ));
 
   const pythonScriptPromise = new Promise((resolve, reject) => {
     pythonScript.on('exit', (code) => {
