@@ -3,8 +3,8 @@ import sys
 
 
 def calculate_food(weight, size):
-    print("Debug: Received weight =", weight)
-    print("Debug: Received size =", size)
+    #print("Debug: Received weight =", weight)
+    #print("Debug: Received size =", size)
     # Sample data for size, weight, daily calories, dry food (gm), wet food (gm)
     sample_data = [
         ("toy", 0.5, 38, 11, 38),
@@ -43,13 +43,9 @@ def calculate_food(weight, size):
 
 size = sys.argv[1]
 weight = float(sys.argv[2])
-print("Hello from Python")
+#print("Hello from Python")
 
 calorie_requirement, dry_food, wet_food = calculate_food(weight, size)
-
-output = {"calories": calorie_requirement,
-          "dry": dry_food,
-          "wet": wet_food}
-output_json = json.dumps(output)
-
-print(output_json)
+print(calorie_requirement)
+print(dry_food)
+print(wet_food)
