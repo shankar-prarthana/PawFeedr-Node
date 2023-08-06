@@ -100,20 +100,35 @@ exports.getTodayFeeds = async function (pet_schedule_id, options = null) {
       
         console.log('query: ' + JSON.stringify(query));
 
-       if (options === null) {
-           options = {
-               sort: {
-               },
-               projection: {
-                   creation_date: 0,
-                   modified_date: 0,
-                   operator_id: 0,
-               },
-           };
-       }
+      //  if (options === null) {
+      //      options = {
+      //          sort: {
+      //          },
+      //          projection: {
+      //              creation_date: 0,
+      //              modified_date: 0,
+      //              operator_id: 0,
+      //          },
+      //      };
+      //  }
        console.log('options: ' + JSON.stringify(options));
 
-       var data = await myDB.collection(COLLECTION_NAME).find(query, options).toArray();
+       var data = await myDB.collection(COLLECTION_NAME).aggregate([
+        { $match: query },
+        {
+            $addFields: {
+                sortField: {
+                    $cond: {
+                        if: { $eq: ['$status', 'cancelled'] },
+                        then: 1,
+                        else: 0
+                    }
+                }
+            }
+        },
+        { $sort: { sortField: 1, schedule_time: 1 } },
+        { $project: { sortField: 0 } }
+    ]).toArray();
        console.log("data: " + JSON.stringify(data));
 
        return data;
