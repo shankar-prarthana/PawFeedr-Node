@@ -102,7 +102,9 @@ exports.addPet = async function (req, res, next) {
         pythonScript = spawn('python3', [fileDogPath, req.body.petSizeCode, req.body.weight, req.body.activityLevelTypeCode, req.body.ageCode]);
     }
     else {
+        console.log('TESTT weight,petSizeCode : ' + JSON.stringify(req.body.weight, req.body.petSizeCode));
         pythonScript = spawn('python3', [fileCatPath, req.body.weight, req.body.petSizeCode]);
+
     }
 
 
@@ -120,7 +122,8 @@ pythonScript.stdout.on('data', (data) => {
     const result = data.toString().trim(); // Convert data to string and remove leading/trailing whitespaces
     output = result.split('\n'); // Split the result on newline characters
   });
-  
+  console.log('TESTT OUTPUT : ' + JSON.stringify(    output   ));
+
   const pythonScriptPromise = new Promise((resolve, reject) => {
     pythonScript.on('exit', (code) => {
       const calories = parseFloat(output[0] || 0); // Parse the first value as a float or default to 0

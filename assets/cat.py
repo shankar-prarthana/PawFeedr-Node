@@ -3,6 +3,8 @@ import sys
 
 
 def calculate_food(weight, size):
+    print("Debug: Received weight =", weight)
+    print("Debug: Received size =", size)
     # Sample data for size, weight, daily calories, dry food (gm), wet food (gm)
     sample_data = [
         ("toy", 0.5, 38, 11, 38),
