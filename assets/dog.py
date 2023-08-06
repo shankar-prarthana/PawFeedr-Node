@@ -57,9 +57,21 @@ def calculate_calorie_requirement(dog_size, weight, activity_level, age):
         }
     }
 
+
     # Calculate calorie requirement based on dog's size, weight, and activity level
-    if dog_size in dog_data and weight in dog_data[dog_size]:
-        calorie_requirements = dog_data[dog_size][weight]
+    if dog_size in dog_data:
+        # Get the weight categories for the selected dog size
+        weight_categories = sorted(dog_data[dog_size].keys())
+        if weight < weight_categories[0]:
+            weight_category = weight_categories[0]
+        elif weight > weight_categories[-1]:
+            weight_category = weight_categories[-1]
+        else:
+            weight_category = next(
+                category for category in weight_categories if weight <= category
+            )
+
+        calorie_requirements = dog_data[dog_size][weight_category]
         if activity_level in calorie_requirements:
             calorie_requirement, wet_food, dry_food = calorie_requirements[activity_level]
 
@@ -70,7 +82,6 @@ def calculate_calorie_requirement(dog_size, weight, activity_level, age):
                 "6M": (795 - 520) / 520,
                 "9M": (785 - 520) / 520,
                 "9Y": (500 - 401) / 401,
-
             }
 
             number = int(re.search(r'\d+', age).group())
@@ -96,6 +107,9 @@ def calculate_calorie_requirement(dog_size, weight, activity_level, age):
             return calorie_requirement, dry_food, wet_food
 
     return None, None, None
+
+
+
 
 
 size = sys.argv[1]
