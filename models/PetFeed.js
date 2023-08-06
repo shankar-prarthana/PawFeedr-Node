@@ -117,7 +117,7 @@ exports.getTodayFeeds = async function (pet_schedule_id, options = null) {
             }
         },
         { $sort: { sortField: 1, schedule_time: 1 } },
-        { $project: { sortField: 0 ,created_date: 0,modified_date:0,operator_id:0} }
+        { $project: { sortField: 0 ,created_date: 0,modified_date:0,operator_id:0} },
         { $limit: 10 }
     ]).toArray();
        console.log("data: " + JSON.stringify(data));
@@ -206,7 +206,7 @@ exports.getTodayFeedsNext = async function(pet_schedule_id, options = null) {
             }
         },
         { $sort: { sortField: 1, schedule_time: 1 } },
-        { $project: { sortField: 0 ,created_date: 0,modified_date:0,operator_id:0} }
+        { $project: { sortField: 0 ,created_date: 0,modified_date:0,operator_id:0} },
         { $limit: 10 }
     ]).toArray();
       console.log("data: " + JSON.stringify(data));
