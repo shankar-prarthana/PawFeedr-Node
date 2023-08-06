@@ -563,7 +563,7 @@ exports.updatePet = async function (req, res, next) {
         pythonScript = spawn('python3', [fileDogPath, req.body.petSizeCode, req.body.weight, req.body.activityLevelTypeCode, req.body.ageCode]);
     }
     else {
-        pythonScript = spawn('python3', [fileCatPath, req.body.weight, req.body.petSizeCode]);
+        pythonScript = spawn('python3', [fileCatPath, req.body.petSizeCode, req.body.weight]);
     }
 
 
@@ -725,6 +725,8 @@ exports.updatePetSchedule = async function (req, res, next) {
 
     var portion1 =0.0;
     if(req.body.portion == petSchedule.portion){
+        console.log('TEST 1: ' + JSON.stringify(petSchedule));
+
         var petFoodAmount = await PetFoodAmountsService.getById(petSchedule.pet_food_amount_id );
         console.log('petFoodAmount: ' + JSON.stringify(petFoodAmount));
         if (petFoodAmount == null) {
