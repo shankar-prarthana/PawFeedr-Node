@@ -43,6 +43,7 @@ def calculate_food(weight, size):
 
 size = sys.argv[1]
 weight = float(sys.argv[2])
+print("Hello from Python")
 
 calorie_requirement, dry_food, wet_food = calculate_food(weight, size)
 

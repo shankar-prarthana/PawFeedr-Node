@@ -103,7 +103,7 @@ exports.addPet = async function (req, res, next) {
     }
     else {
         console.log('TESTT weight,petSizeCode : ' + req.body.weight+""+ req.body.petSizeCode);
-        pythonScript = spawn('python3', [fileCatPath, req.body.weight, req.body.petSizeCode]);
+        pythonScript = spawn('python3', [fileCatPath, req.body.petSizeCode, req.body.weight]);
 
     }
 
