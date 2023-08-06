@@ -805,7 +805,7 @@ var isFirstFeedProcessed = false
             var newPetFeed = {
                 pet_schedule_id: updatePetSchedule._id,
                 timing:req.body.timings[i],
-                amount: req.body.portion,
+                amount: portion1,
                 schedule_time:targetTime,
                 operator_id: 'updatePet',
             };
