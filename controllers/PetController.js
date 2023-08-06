@@ -491,6 +491,7 @@ exports.cancelFeed = async function (req, res, next) {
     return res.status(200).send({ status: 'success', message:'Cancelled feed successfully!' });
 }
 exports.updatePet = async function (req, res, next) {
+
     // console.log('In addPet');
     console.log('req.body: ' + JSON.stringify(req.body));
     if ((req.body.pet_id == null) || (req.body.name == null) || (req.body.petTypeCode == null) || (req.body.ageCode == null) || (req.body.gender == null) || (req.body.weight == null) || (req.body.petSizeCode == null) || (req.body.foodTypeCode == null)) {
@@ -499,6 +500,7 @@ exports.updatePet = async function (req, res, next) {
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
     }
+
  
     var existingPet = await PetsServices.getById(req.body.pet_id);
     if (existingPet == null) {
@@ -552,7 +554,7 @@ exports.updatePet = async function (req, res, next) {
     if (petType.code == "dog") {
         updatePet.activity_level_type_id = activityLevelType._id;
     }
-
+ try{
     var updatePet = await PetsServices.update(existingPet._id,updatePet);
     console.log('updatePet: ' + JSON.stringify(updatePet));
    
@@ -602,6 +604,7 @@ pythonScript.stdout.on('data', (data) => {
       reject(error);
     });
   });
+
 
   var petFoodAmount = await PetFoodAmountsService.getByPetId(existingPet._id);
     console.log('petFoodAmount: ' + JSON.stringify(petFoodAmount));
@@ -702,7 +705,12 @@ var isFirstFeedProcessed = false
 
 
     return res.status(200).send({ status: "success", pet: updatePet, pet_food_amount: updateFoodAmount, pet_schedule: updatePetSchedule, message: "Updated pet successfully!" });
-
+ }
+ catch (error) {
+    // Handle any errors that might occur during the process
+    console.error("An error occurred:", error);
+    return res.status(200).send({ status: "error", message: "An error occurred during processing." });
+}
 
 }
 exports.updatePetSchedule = async function (req, res, next) {
@@ -769,7 +777,8 @@ exports.updatePetSchedule = async function (req, res, next) {
         operator_id: 'updatePetSchedule',
     };
 
- 
+ async function update(){
+    try {
     var updatedPetSchedule = await PetSchedulesServices.update(petSchedule._id,updatePetSchedule);
     console.log('updatedPetSchedule: ' + JSON.stringify(updatedPetSchedule));
 
@@ -829,7 +838,16 @@ var isFirstFeedProcessed = false
     console.log('updatedPetSchedule: ' + JSON.stringify(updatedPetSchedule));
 
     return res.status(200).send({ status: "success",  pet_schedule: updatedPetSchedule, message: "Updated pet Schedule successfully!" });
+    }
+    catch (error) {
+        // Handle any errors that might occur during the process
+        console.error("An error occurred:", error);
+        return res.status(200).send({ status: "error", message: "An error occurred during processing." });
+    }
+ }
+ update();
 
+   
 
 }
 exports.updateBowlWeight = async function (req, res, next) {
