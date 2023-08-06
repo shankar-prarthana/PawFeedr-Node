@@ -714,7 +714,6 @@ exports.updatePetSchedule = async function (req, res, next) {
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
     }
- 
    
     var petSchedule = await PetSchedulesServices.getById(req.body.pet_schedule_id );
     console.log('petSchedule: ' + JSON.stringify(petSchedule));
@@ -764,7 +763,7 @@ exports.updatePetSchedule = async function (req, res, next) {
         portion1=req.body.portion;
     }
     var updatePetSchedule = {
-        portion: portion1.toFixed(0),
+        portion: portion1,
         frequency:parseInt(req.body.frequency),
         timings:req.body.timings,
         operator_id: 'updatePetSchedule',
