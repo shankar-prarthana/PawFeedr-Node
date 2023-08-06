@@ -102,7 +102,7 @@ exports.addPet = async function (req, res, next) {
         pythonScript = spawn('python3', [fileDogPath, req.body.petSizeCode, req.body.weight, req.body.activityLevelTypeCode, req.body.ageCode]);
     }
     else {
-        pythonScript = spawn('python3', [fileCatPath, req.body.weight, req.body.ageCode]);
+        pythonScript = spawn('python3', [fileCatPath, req.body.weight, req.body.petSizeCode]);
     }
 
 
@@ -558,7 +558,7 @@ exports.updatePet = async function (req, res, next) {
         pythonScript = spawn('python3', [fileDogPath, req.body.petSizeCode, req.body.weight, req.body.activityLevelTypeCode, req.body.ageCode]);
     }
     else {
-        pythonScript = spawn('python3', [fileCatPath, req.body.weight, req.body.ageCode]);
+        pythonScript = spawn('python3', [fileCatPath, req.body.weight, req.body.petSizeCode]);
     }
 
 
@@ -605,32 +605,33 @@ pythonScript.stdout.on('data', (data) => {
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
   // Use the variables `calories`, `dry_food`, and `wet_food` as needed
-
+ 
 
     var updateFoodAmount =  await pythonScriptPromise;
     updateFoodAmount = await PetFoodAmountsService.update(petFoodAmount._id,updateFoodAmount);
     console.log('updateFoodAmount: ' + JSON.stringify(updateFoodAmount));
-    
 
-    var portion1 = 0.0;
-    if (foodType.code == 'dry') {
-        portion1 = updateFoodAmount.dry_food_per_day / 3
-        console.log("in PORTION "+updateFoodAmount.dry_food_per_day );
-        console.log("in PORTION "+portion1);
-
-    }
-    else {
-        portion1 = updateFoodAmount.wet_food_per_day / 3
-        console.log("in PORTION "+portion1);
-        console.log("in PORTION "+updateFoodAmount.wet_food_per_day );
-
-    }
     var petSchedule = await PetSchedulesServices.getByPetFoodAmountId(updateFoodAmount._id);
     console.log('petSchedule: ' + JSON.stringify(petSchedule));
     if (petSchedule == null) {
         console.log("in petSchedule");
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
+    
+    var portion1 = 0.0;
+    if (foodType.code == 'dry') {
+        portion1 = updateFoodAmount.dry_food_per_day / petSchedule.frequency
+        console.log("in PORTION "+updateFoodAmount.dry_food_per_day );
+        console.log("in PORTION "+portion1);
+
+    }
+    else {
+        portion1 = updateFoodAmount.wet_food_per_day / petSchedule.frequency
+        console.log("in PORTION "+portion1);
+        console.log("in PORTION "+updateFoodAmount.wet_food_per_day );
+
+    }
+  
 
     var updatePetSchedule = {
         portion: portion1.toFixed(0),
@@ -717,8 +718,46 @@ exports.updatePetSchedule = async function (req, res, next) {
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
 
+    var portion1 =0.0;
+    if(req.body.portion == petSchedule.portion){
+        var petFoodAmount = await PetFoodAmountsService.getById(petSchedule.pet_food_amount_id );
+        console.log('petFoodAmount: ' + JSON.stringify(petFoodAmount));
+        if (petFoodAmount == null) {
+            console.log("in petFoodAmount");
+            return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+        }
+        var Pet = await PetsServices.getById(petFoodAmount.pet_id);
+        if (Pet == null) {
+            console.log("in Pet");
+            return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+        }
+
+    
+        var foodType = await RefFoodTypesService.getById(Pet.food_type_id);
+        if (foodType == null) {
+            console.log("in foodType");
+            return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+        }
+
+    if (foodType.code == 'dry') {
+        portion1 = petFoodAmount.dry_food_per_day / req.body.frequency
+        console.log("in PORTION "+petFoodAmount.dry_food_per_day );
+        console.log("in PORTION "+portion1);
+
+    }
+    else {
+        portion1 = petFoodAmount.wet_food_per_day / req.body.frequency
+        console.log("in PORTION "+portion1);
+        console.log("in PORTION "+petFoodAmount.wet_food_per_day );
+
+    }
+    
+    }
+    else{
+        portion1=req.body.portion;
+    }
     var updatePetSchedule = {
-        portion: req.body.portion,
+        portion: portion1.toFixed(0),
         frequency:parseInt(req.body.frequency),
         timings:req.body.timings,
         operator_id: 'updatePetSchedule',
@@ -744,7 +783,7 @@ exports.updatePetSchedule = async function (req, res, next) {
   
 
 var isFirstFeedProcessed = false
-    for (let i = 0; i < updatePetSchedule.frequency; i++) {
+    for (let i = 0; i < req.body.frequency; i++) {
         const currentTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
         const targetTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
         const timeParts = req.body.timings[i].split(":");
