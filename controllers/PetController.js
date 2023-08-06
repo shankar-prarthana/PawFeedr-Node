@@ -757,7 +757,7 @@ exports.updatePetSchedule = async function (req, res, next) {
         console.log("in PORTION "+petFoodAmount.wet_food_per_day );
 
     }
-    
+    portion1=portion1.toFixed(0);    
     }
     else{
         portion1=req.body.portion;
