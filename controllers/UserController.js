@@ -12,9 +12,7 @@ var UserArduinoDeviceService = require('../models/UserArduinoDevice')
 var UserNotificationServices = require('../models/UserNotification')
 var InAppMessagesServices = require('../models/InAppMessages')
 var TeleSignSDK = require('telesignsdk');
-const  moment  = require('moment');
-
-
+const moment = require('moment');
 const crypto = require('crypto');
 const { Timestamp } = require('mongodb');
 var genRandomString = function (length) {
@@ -22,8 +20,7 @@ var genRandomString = function (length) {
         .toString('hex')
         .slice(0, length);
 };
-
-var sendOTPSMS = async function (input) {
+var sendOTPSMS = async function (input,res) {
     const phoneNumber = "+91" + input.mobile;
     const mobile = input.mobile;
     const accountSid = 'ACe0a74a4f8fac5352c07ef03e229fe295';
@@ -94,14 +91,28 @@ var sendOTPSMS = async function (input) {
     console.log('newMobileMessage: ' + JSON.stringify(newMobileMessage));
 
 
-
     client.messages
-        .create({
-            body: message,
-            from: from,
-            to: phoneNumber
-        })
-        .then(message => console.log(message.sid))
+    .create({
+      body: message,
+      from: from,
+      to: phoneNumber
+    })
+    .then((message) => {
+      console.log(message.sid);
+      return res.status(200).send({ status: "success", message: "OTP Sent Successfully!" });
+
+    })
+    .catch((twilioError) => {
+        console.log(message.sid);
+      // Check if the error code is 21608 (unverified number for trial account)
+      if (twilioError.code === 21608) {
+        return res.status(200).send({ status: 403, message: 'Please verify new number on twillio first!' });
+    }
+});
+
+
+
+
 }
 var sha512 = function (password, salt) {
     var hash = crypto.createHmac('sha512', password + salt); /** Hashing algorithm sha512 */
@@ -112,8 +123,6 @@ var sha512 = function (password, salt) {
         passwordHash: value
     };
 };
-
-
 exports.validateMobileNumber = async function (req, res, next) {
     console.log('In signupUser');
     console.log('req.body: ' + JSON.stringify(req.body));
@@ -123,7 +132,6 @@ exports.validateMobileNumber = async function (req, res, next) {
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
     }
-
     var existingUser = await UserService.getByMobile(mobile);
     if (existingUser !== null) {
         return res.status(200).send({ status: 403, message: 'Mobile number is already in use.' });
@@ -133,14 +141,8 @@ exports.validateMobileNumber = async function (req, res, next) {
         notificationTypeCode: "SIGNUP_VALIDATION_OTP",
         operator_id: "validateMobileNumber",
     };
-    sendOTPSMS(input);
-
-    return res.status(200).send({ status: "success", message: "OTP Sent Successfully!" });
-
-
-
+    sendOTPSMS(input,res);
 }
-
 exports.verifyOTP = async function (req, res, next) {
     // console.log('In signupUser');
     const mobile = parseInt(req.body.mobile)
@@ -190,7 +192,6 @@ exports.verifyOTP = async function (req, res, next) {
 
 
 }
-
 exports.resetPasswordValidation = async function (req, res, next) {
     // console.log('In sendValidationOTP');
     console.log('req.body: ' + JSON.stringify(req.body));
@@ -210,18 +211,11 @@ exports.resetPasswordValidation = async function (req, res, next) {
         notificationTypeCode: "RESET_PASSWORD_OTP",
         operator_id: "resetPasswordValidation",
     };
-    sendOTPSMS(input);
+    sendOTPSMS(input,res);
 
-    return res.status(200).send({ status: "success", message: "OTP Sent Successfully!" });
 
 
 }
-
-
-
-
-
-
 exports.signupUser = async function (req, res, next) {
     // console.log('In signupUser');
     const mobile = parseInt(req.body.mobile)
@@ -304,7 +298,6 @@ exports.signupUser = async function (req, res, next) {
 
 
 }
-
 exports.resetPassword = async function (req, res, next) {
     // console.log('In resetPassword');
     const mobile = parseInt(req.body.mobile)
@@ -352,11 +345,6 @@ exports.resetPassword = async function (req, res, next) {
 
 
 }
-
-
-
-
-
 exports.loginUser = async function (req, res, next) {
     // console.log('In loginUser');
     const mobile = parseInt(req.body.mobile)
@@ -478,7 +466,6 @@ exports.loginUser = async function (req, res, next) {
 
 
 }
-
 exports.getExistingSession = async function (req, res, next) {
     // console.log('In loginUser');
     console.log('req.body: ' + JSON.stringify(req.body));
@@ -506,7 +493,6 @@ exports.getExistingSession = async function (req, res, next) {
 
 
 }
-
 exports.saveUserDeviceToken = async function (req, res, next) {
     // console.log('In saveDeviceCode');
     console.log('req.body: ' + JSON.stringify(req.body));
@@ -536,13 +522,12 @@ exports.saveUserDeviceToken = async function (req, res, next) {
 
 
 }
-
 exports.saveArduinoDevice = async function (req, res, next) {
     // console.log('In saveDeviceCode');
     console.log('req.body: ' + JSON.stringify(req.body));
-    if ((req.body.user_id == null) || (req.body.ssid == null)|| (req.body.ip_add == null)|| (req.body.wifi_ssid == null)|| (req.body.wifi_ip == null)|| (req.body.wifi_password == null)) {
+    if ((req.body.user_id == null) || (req.body.ssid == null) || (req.body.ip_add == null) || (req.body.wifi_ssid == null) || (req.body.wifi_ip == null) || (req.body.wifi_password == null)) {
 
-        console.log("user_id:" + req.body.user_id + "ssid:" + req.body.ssid  + "ip_add:" + req.body.ip_add);
+        console.log("user_id:" + req.body.user_id + "ssid:" + req.body.ssid + "ip_add:" + req.body.ip_add);
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
     }
@@ -554,12 +539,12 @@ exports.saveArduinoDevice = async function (req, res, next) {
     var newUserArduinoDevice = {
         user_id: existingUser._id,
         ssid: req.body.ssid,
-        ip_add:req.body.ip_add,
+        ip_add: req.body.ip_add,
         wifi_ssid: req.body.wifi_ssid,
-        wifi_ip:req.body.wifi_ip,
-        wifi_password:req.body.wifi_password,
+        wifi_ip: req.body.wifi_ip,
+        wifi_password: req.body.wifi_password,
         operator_id: 'saveArduinoDevice'
-       };
+    };
 
     var newUserArduinoDevice = await UserArduinoDeviceService.create(newUserArduinoDevice);
     console.log('newUserArduinoDevice: ' + JSON.stringify(newUserArduinoDevice));
@@ -570,10 +555,6 @@ exports.saveArduinoDevice = async function (req, res, next) {
 
 
 }
-
-
-
-
 exports.sendInAppNotification = async function (req, res, next) {
     console.log('req.body: ' + JSON.stringify(req.body));
     if ((req.body.user_id == null) || (req.body.notification_type_code == null)) {
@@ -648,7 +629,6 @@ exports.sendInAppNotification = async function (req, res, next) {
 
 
 }
-
 exports.changeMobile = async function (req, res, next) {
     // console.log('In sendValidationOTP');
     console.log('req.body: ' + JSON.stringify(req.body));
@@ -672,13 +652,11 @@ exports.changeMobile = async function (req, res, next) {
         notificationTypeCode: "CHANGE_MOBILE_OTP",
         operator_id: "changeMobile",
     };
-    sendOTPSMS(input);
+    sendOTPSMS(input,res);
 
-    return res.status(200).send({ status: "success", message: "OTP Sent Successfully!" });
 
 
 }
-
 exports.updateUser = async function (req, res, next) {
     // console.log('In sendValidationOTP');
     console.log('req.body: ' + JSON.stringify(req.body));
@@ -704,9 +682,6 @@ exports.updateUser = async function (req, res, next) {
 
 
 }
-
-
-
 exports.logout = async function (req, res, next) {
     // console.log('In loginUser');
     const mobile = parseInt(req.body.user_id)
@@ -744,12 +719,11 @@ exports.logout = async function (req, res, next) {
 
 
 }
-
 exports.getUserNotification = async function (req, res, next) {
     // console.log('In getAllCountries');
     if ((req.body.user_id == null)) {
 
-        console.log("user_id:" + req.body.user_id );
+        console.log("user_id:" + req.body.user_id);
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
     }
@@ -759,32 +733,32 @@ exports.getUserNotification = async function (req, res, next) {
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
     var UserNotification = await UserNotificationServices.getAllByUserId(existingUser._id);
-    console.log("UserNotification"+UserNotification);
+    console.log("UserNotification" + UserNotification);
 
     if (UserNotification == null) {
         console.log("in UserNotificationServices");
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
 
-    for(let i= 0 ;i<UserNotification.length;i++){
+    for (let i = 0; i < UserNotification.length; i++) {
         //console.log("HELLO");
 
         var refNotificationTypes = await RefNotificationTypesService.getById(UserNotification[i].notification_type_id);
 
-    if (refNotificationTypes == null) {
-        console.log("in refNotificationTypes");
-        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
-    }
+        if (refNotificationTypes == null) {
+            console.log("in refNotificationTypes");
+            return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+        }
 
-    UserNotification[i] = {is_on:UserNotification[i].is_on,notification_type:refNotificationTypes };
+        UserNotification[i] = { is_on: UserNotification[i].is_on, notification_type: refNotificationTypes };
     }
-    return res.status(200).send({ status: 'success', user_notifications: UserNotification, message:'Got Notifications successfully!' });
+    return res.status(200).send({ status: 'success', user_notifications: UserNotification, message: 'Got Notifications successfully!' });
 }
 exports.updateUserNotification = async function (req, res, next) {
     // console.log('In updateUserNotification');
-    if ((req.body.user_id == null)||(req.body.notificationTypeCode == null)||(req.body.is_on == null)) {
+    if ((req.body.user_id == null) || (req.body.notificationTypeCode == null) || (req.body.is_on == null)) {
 
-        console.log("user_id:" + req.body.user_id +"notificationTypeCode:" + req.body.notificationTypeCode +"is_on:" + req.body.is_on  );
+        console.log("user_id:" + req.body.user_id + "notificationTypeCode:" + req.body.notificationTypeCode + "is_on:" + req.body.is_on);
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
     }
@@ -799,23 +773,22 @@ exports.updateUserNotification = async function (req, res, next) {
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
 
-    var UserNotification = await UserNotificationServices.getByUserIdNotificationTypeId(existingUser._id,refNotificationTypes._id);
-    console.log("UserNotification"+UserNotification);
+    var UserNotification = await UserNotificationServices.getByUserIdNotificationTypeId(existingUser._id, refNotificationTypes._id);
+    console.log("UserNotification" + UserNotification);
 
     if (UserNotification == null) {
         console.log("in UserNotificationServices");
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
 
-   UserNotification = await UserNotificationServices.update(UserNotification._id,req.body.is_on)
-    return res.status(200).send({ status: 'success', user_notifications: UserNotification, message:'Updated Notfications successfully!' });
+    UserNotification = await UserNotificationServices.update(UserNotification._id, req.body.is_on)
+    return res.status(200).send({ status: 'success', user_notifications: UserNotification, message: 'Updated Notfications successfully!' });
 }
-
 exports.getArduinoDevice = async function (req, res, next) {
     // console.log('In getAllCountries');
     if ((req.body.user_id == null)) {
 
-        console.log("user_id:" + req.body.user_id );
+        console.log("user_id:" + req.body.user_id);
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
     }
@@ -825,22 +798,21 @@ exports.getArduinoDevice = async function (req, res, next) {
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
     var UserArduinoDevice = await UserArduinoDeviceService.getByUserId(existingUser._id);
-    console.log("UserArduinoDevice"+UserArduinoDevice);
+    console.log("UserArduinoDevice" + UserArduinoDevice);
 
     if (UserArduinoDevice == null) {
         console.log("in UserArduinoDevice");
         return res.status(200).send({ status: 403, message: 'Looks like you have not added a device.' });
     }
 
-   
-    return res.status(200).send({ status: 'success', user_arduino_device: UserArduinoDevice, message:'Got User Arduino device successfully!' });
-}
 
+    return res.status(200).send({ status: 'success', user_arduino_device: UserArduinoDevice, message: 'Got User Arduino device successfully!' });
+}
 exports.removeArduinoDevice = async function (req, res, next) {
     // console.log('In updateUserNotification');
     if ((req.body.user_id == null)) {
 
-        console.log("user_id:" + req.body.user_id );
+        console.log("user_id:" + req.body.user_id);
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
     }
@@ -849,10 +821,10 @@ exports.removeArduinoDevice = async function (req, res, next) {
         console.log("in UserService");
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
-   
+
 
     var UserArduinoDevice = await UserArduinoDeviceService.getByUserId(existingUser._id);
-    console.log("UserArduinoDevice"+UserArduinoDevice);
+    console.log("UserArduinoDevice" + UserArduinoDevice);
 
     if (UserArduinoDevice == null) {
         console.log("in UserArduinoDevice");
@@ -860,5 +832,5 @@ exports.removeArduinoDevice = async function (req, res, next) {
     }
 
     UserArduinoDevice = await UserArduinoDeviceService.expire(existingUser._id)
-    return res.status(200).send({ status: 'success',  message:'Updated Notfications successfully!' });
+    return res.status(200).send({ status: 'success', message: 'Updated Notfications successfully!' });
 }
