@@ -523,32 +523,36 @@ exports.saveUserDeviceToken = async function (req, res, next) {
 
 }
 exports.saveArduinoDevice = async function (req, res, next) {
-    // console.log('In saveDeviceCode');
-    console.log('req.body: ' + JSON.stringify(req.body));
-    if ((req.body.user_id == null) || (req.body.ssid == null) || (req.body.ip_add == null) || (req.body.wifi_ssid == null) || (req.body.wifi_ip == null) || (req.body.wifi_password == null)) {
+    // console.log('In saveArduinoDevice');
+    console.log('req.query: ' + JSON.stringify(req.query));
+    if ((req.query.user_id == null) || (req.query.ssid == null) || (req.query.ip_add == null) || (req.query.wifi_ssid == null) || (req.query.wifi_ip == null) || (req.query.wifi_password == null)) {
 
-        console.log("user_id:" + req.body.user_id + "ssid:" + req.body.ssid + "ip_add:" + req.body.ip_add);
+        console.log("user_id:" + req.query.user_id + "ssid:" + req.query.ssid + "ip_add:" + req.query.ip_add);
         return res.status(200).send({ status: 403, message: 'Missing paramters' });
 
     }
-    var existingUser = await UserService.getById(req.body.user_id);
+    var existingUser = await UserService.getById(req.query.user_id);
     if (existingUser == null) {
+        console.log(" in user_id");
+
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
     }
 
     var newUserArduinoDevice = {
         user_id: existingUser._id,
-        ssid: req.body.ssid,
-        ip_add: req.body.ip_add,
-        wifi_ssid: req.body.wifi_ssid,
-        wifi_ip: req.body.wifi_ip,
-        wifi_password: req.body.wifi_password,
+        ssid: req.query.ssid,
+        ip_add: req.query.ip_add,
+        wifi_ssid: req.query.wifi_ssid,
+        wifi_ip: req.query.wifi_ip,
+        wifi_password: req.query.wifi_password,
         operator_id: 'saveArduinoDevice'
     };
 
     var newUserArduinoDevice = await UserArduinoDeviceService.create(newUserArduinoDevice);
     console.log('newUserArduinoDevice: ' + JSON.stringify(newUserArduinoDevice));
     if (newUserArduinoDevice == null) {
+        console.log(" in newUserArduinoDevice");
+
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
     }
     return res.status(200).send({ status: "success", user_arduino_device: newUserArduinoDevice, message: "Saved user arduino device successfully" });

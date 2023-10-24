@@ -1,4 +1,3 @@
-
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
@@ -25,24 +24,31 @@ router.use(acceptMethods);
 
 router.use(bodyParser.urlencoded({ limit: '500mb', extended: false, parameterLimit: 1000000 }));
 router.use(bodyParser.json({ limit: '500mb' }));
-
+router.use(function (req, res, next) {
+  process.env.TZ = 'Asia/Kolkata';
   
-  router.use(fileupload());
-  router.post('/validateMobileNumber', UserController.validateMobileNumber);
-  router.post('/verifyOTP', UserController.verifyOTP);
-  router.post('/resetPasswordValidation', UserController.resetPasswordValidation);
-  router.post('/resetPassword', UserController.resetPassword);
-  router.post('/getExistingSession', UserController.getExistingSession);
-  router.post('/signupUser', UserController.signupUser);
-  router.post('/loginUser', UserController.loginUser);
-  router.post('/saveUserDeviceToken', UserController.saveUserDeviceToken);
-  router.post('/sendInAppNotification',UserController.sendInAppNotification);
-  router.post('/logout', UserController.logout);
-  router.post('/changeMobile', UserController.changeMobile);
-  router.post('/getUserNotification', UserController.getUserNotification);
-  router.post('/updateUser', UserController.updateUser);
-  router.post('/updateUserNotification', UserController.updateUserNotification);
-  router.post('/saveArduinoDevice', UserController.saveArduinoDevice);
-  router.post('/getArduinoDevice', UserController.getArduinoDevice);
-  router.post('/removeArduinoDevice', UserController.removeArduinoDevice);
+    // Continue processing the next middleware/route handler
+    next();
+  });
+  
+router.use(fileupload());
+router.post('/validateMobileNumber', UserController.validateMobileNumber);
+router.post('/verifyOTP', UserController.verifyOTP);
+router.post('/resetPasswordValidation', UserController.resetPasswordValidation);
+router.post('/resetPassword', UserController.resetPassword);
+router.post('/getExistingSession', UserController.getExistingSession);
+router.post('/signupUser', UserController.signupUser);
+router.post('/loginUser', UserController.loginUser);
+router.post('/saveUserDeviceToken', UserController.saveUserDeviceToken);
+router.post('/sendInAppNotification',UserController.sendInAppNotification);
+router.post('/logout', UserController.logout);
+router.post('/changeMobile', UserController.changeMobile);
+router.post('/getUserNotification', UserController.getUserNotification);
+router.post('/updateUser', UserController.updateUser);
+router.post('/updateUserNotification', UserController.updateUserNotification);
+router.post('/saveArduinoDevice', UserController.saveArduinoDevice);
+router.post('/getArduinoDevice', UserController.getArduinoDevice);
+router.post('/removeArduinoDevice', UserController.removeArduinoDevice);
+
+
 module.exports = router;

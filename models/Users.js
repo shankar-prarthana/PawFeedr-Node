@@ -1,37 +1,22 @@
 const COLLECTION_NAME = 'users';
 var ObjectId = require('mongodb').ObjectId;
 const  moment  = require('moment');
-
 exports.getByMobile = async function (mobile, options = null) {
-     console.log('In getByMobile');
-     console.log('mobile: ' + mobile);
-    console.log('options: ' + JSON.stringify(options));
-
     try {
         const query = {
-            mobile: mobile,
-            is_deleted: false,
+            mobile: mobile, is_deleted: false,
         };
-        // console.log('query: ' + JSON.stringify(query));
-
         if (options === null) {
             options = {
                 sort: {
                     name: 1,
                 },
                 projection: {
-                    is_active: 0,
-                    creation_date: 0,
-                    modified_date: 0,
-                    operator_id: 0,
+                    is_active: 0, creation_date: 0, modified_date: 0, operator_id: 0,
                 },
             };
         }
-        console.log('options: ' + JSON.stringify(options));
-
         var data = await myDB.collection(COLLECTION_NAME).findOne(query, options);
-        console.log("data: " + JSON.stringify(data));
-
         return data;
     } catch (e) {
         console.log(e);

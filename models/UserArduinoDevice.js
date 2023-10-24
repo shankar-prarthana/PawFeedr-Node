@@ -123,7 +123,7 @@ exports.expire = async function (user_id) {
     
     try {
         const query = {
-            user_id: new ObjectId(user_id),
+            user_id: new ObjectId(user_id.stringify)
         };
          console.log('query: ' + JSON.stringify(query));
 
