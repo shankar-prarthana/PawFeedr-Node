@@ -78,7 +78,7 @@ exports.getHistory = async function (pet_schedule_id, options = null) {
    }
 }
 exports.getIncomplete = async function (pet_schedule_id, options = null) {
-  console.log('In getHistory');
+  console.log('In getIncomplete');
   console.log('pet_schedule_id: ' + pet_schedule_id);
  console.log('options: ' + JSON.stringify(options));
  const weekAgo = moment.parseZone(new Date()).utcOffset("+05:30")._d;
@@ -89,7 +89,7 @@ exports.getIncomplete = async function (pet_schedule_id, options = null) {
   const query = {
       pet_schedule_id: new ObjectId(pet_schedule_id),
       modified_date: { $gte: weekAgo },
-      status: { $in: ['created', 'upcoming'] }
+      status: { $nin: ['cancelled', 'expired'] }
     };
     
       console.log('query: ' + JSON.stringify(query));
