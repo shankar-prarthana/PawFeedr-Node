@@ -145,8 +145,8 @@ exports.getTodayFeeds = async function (pet_schedule_id, options = null) {
             $addFields: {
                 sortField: {
                     $cond: {
-                        if: { $eq: ['$status', 'cancelled'] },
-                        then: 1,
+                      if: { $in: ['$status', ['expired', 'cancelled']] },
+                      then: 1,
                         else: 0
                     }
                 }
