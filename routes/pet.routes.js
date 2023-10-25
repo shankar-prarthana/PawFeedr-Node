@@ -45,5 +45,6 @@ router.post('/updatePet', PetController.updatePet);
 router.post('/updatePetSchedule', PetController.updatePetSchedule);
 router.post('/updateBowlWeight', PetController.updateBowlWeight);
 router.post('/updatePetFeed', PetController.updatePetFeed);
+router.post('/dailyUpdateFeed', PetController.dailyUpdateFeed);
 
 module.exports = router;
