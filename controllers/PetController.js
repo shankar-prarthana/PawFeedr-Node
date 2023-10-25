@@ -975,7 +975,19 @@ exports.dailyUpdateFeed = async function (req, res, next) {
                 return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
             }
             
-              
+            var petFeeds = await PetFeedServices.getIncomplete(petSchedule._id);
+            console.log('petFeeds: ' + JSON.stringify(petFeeds));
+            for (let i = 0; i < petFeeds.length; i++) {
+            
+                        var updatePetFeed = {
+                        status: 'expired',
+                        operator_id: 'updatePet',
+                    };
+        
+                    var updatePetFeed = await PetFeedServices.update(petFeeds[i]._id,updatePetFeed);
+                    console.log('updatePetFeed: ' + JSON.stringify(updatePetFeed));
+                  
+            }
             
             var isFirstFeedProcessed = false
                 for (let i = 0; i < petSchedule.frequency; i++) {

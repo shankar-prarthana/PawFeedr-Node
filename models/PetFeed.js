@@ -77,6 +77,45 @@ exports.getHistory = async function (pet_schedule_id, options = null) {
        throw Error('Error')
    }
 }
+exports.getIncomplete = async function (pet_schedule_id, options = null) {
+  console.log('In getHistory');
+  console.log('pet_schedule_id: ' + pet_schedule_id);
+ console.log('options: ' + JSON.stringify(options));
+ const weekAgo = moment.parseZone(new Date()).utcOffset("+05:30")._d;
+ weekAgo.setDate(weekAgo.getDate() - 7); 
+
+
+ try {
+  const query = {
+      pet_schedule_id: new ObjectId(pet_schedule_id),
+      modified_date: { $gte: weekAgo },
+      status: { $in: ['created', 'upcoming'] }
+    };
+    
+      console.log('query: ' + JSON.stringify(query));
+
+     if (options === null) {
+         options = {
+             sort: {
+             },
+             projection: {
+                 creation_date: 0,
+                 modified_date: 0,
+                 operator_id: 0,
+             },
+         };
+     }
+     console.log('options: ' + JSON.stringify(options));
+
+     var data = await myDB.collection(COLLECTION_NAME).find(query, options).toArray();
+     console.log("data: " + JSON.stringify(data));
+
+     return data;
+ } catch (e) {
+     console.log(e);
+     throw Error('Error')
+ }
+}
 exports.getTodayFeeds = async function (pet_schedule_id, options = null) {
     console.log('In getTodayFeeds');
     console.log('pet_schedule_id: ' + pet_schedule_id);
