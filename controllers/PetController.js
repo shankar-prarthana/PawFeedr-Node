@@ -974,7 +974,6 @@ exports.dailyUpdateFeed = async function (req, res, next) {
                 console.log("in petSchedule");
                 return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
             }
-            async function update(){
             
               
             
@@ -1018,13 +1017,12 @@ exports.dailyUpdateFeed = async function (req, res, next) {
             
             
                 
-             }
-             update();
-             return res.status(200).send({ status: "success",   message: "Updated pet Schedule successfully!" });
+      
 
         } 
        
    
+        return res.status(200).send({ status: "success",   message: "Updated pet Schedule successfully!" });
 
   
 
