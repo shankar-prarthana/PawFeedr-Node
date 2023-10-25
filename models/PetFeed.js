@@ -129,9 +129,6 @@ exports.getTodayFeeds = async function (pet_schedule_id, options = null) {
         schedule_time: {
             $gte: today,
             $lt: moment.parseZone(new Date(today.getTime() + 24 * 60 * 60 * 1000)).utcOffset("+05:30")._d   // Add 24 hours to get the end of the day
-          },
-          status: {
-            $ne: 'expired'
           }
         
       };
