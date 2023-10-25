@@ -952,3 +952,83 @@ exports.updatePetFeed = async function (req, res, next) {
 
 }
 
+exports.dailyUpdateFeed = async function (req, res, next) {
+    // console.log('In updatePetSchedule');
+   
+   
+        var Pets = await PetsServices.getAllPets();
+        if (Pets == null) {
+            console.log("in Pet");
+            return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+        }
+        for (let i = 0; i < Pets.length; i++) {
+            var petFoodAmount = await PetFoodAmountsService.getByPetId(Pets[i]._id );
+            console.log('petFoodAmount: ' + JSON.stringify(petFoodAmount));
+            if (petFoodAmount == null) {
+                console.log("in petFoodAmount");
+                return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+            }
+            var petSchedule = await PetSchedulesServices.getByPetFoodAmountId(petFoodAmount._id);
+            console.log('petSchedule: ' + JSON.stringify(petSchedule));
+            if (petSchedule == null) {
+                console.log("in petSchedule");
+                return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+            }
+            async function update(){
+            
+              
+            
+            var isFirstFeedProcessed = false
+                for (let i = 0; i < petSchedule.frequency; i++) {
+                    const currentTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
+                    const targetTime = moment.parseZone(new Date()).utcOffset("+05:30")._d;
+                    const timeParts = petSchedule.timings[i].split(":");
+                    const hour = parseInt(timeParts[0], 10);
+                    const minutes = parseInt(timeParts[1], 10);
+                    targetTime.setUTCHours(hour);
+                    targetTime.setUTCMinutes(minutes);
+                  
+                  
+            
+                    if (currentTime < targetTime) {
+                        
+                        var newPetFeed = {
+                            pet_schedule_id: petSchedule._id,
+                            timing:petSchedule.timings[i],
+                            amount: petSchedule.portion,
+                            schedule_time:targetTime,
+                            operator_id: 'updatePet',
+                        };
+                        if (!isFirstFeedProcessed) {
+                            newPetFeed.status = "upcoming";
+                          }
+                          else{
+                            newPetFeed.status = "created";
+                          }
+            
+                        var newPetFeed = await PetFeedServices.create(newPetFeed);
+                        console.log('newPetFeed: ' + JSON.stringify(newPetFeed));
+                        if (newPetFeed == null) {
+                            return res.status(200).send({ status: 403, message: 'There seems to be an error at our end.' });
+                        }
+                        isFirstFeedProcessed=true;
+            
+                    }
+                }
+            
+            
+                return res.status(200).send({ status: "success",   message: "Updated pet Schedule successfully!" });
+                
+             }
+             update();
+
+        } 
+       
+   
+
+  
+
+
+   
+
+}
