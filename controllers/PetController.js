@@ -1017,10 +1017,10 @@ exports.dailyUpdateFeed = async function (req, res, next) {
                 }
             
             
-                return res.status(200).send({ status: "success",   message: "Updated pet Schedule successfully!" });
                 
              }
              update();
+             return res.status(200).send({ status: "success",   message: "Updated pet Schedule successfully!" });
 
         } 
        
