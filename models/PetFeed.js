@@ -58,6 +58,8 @@ exports.getHistory = async function (pet_schedule_id, options = null) {
        if (options === null) {
            options = {
                sort: {
+                modified_date: -1
+
                },
                projection: {
                    creation_date: 0,
