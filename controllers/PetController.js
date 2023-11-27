@@ -311,12 +311,14 @@ exports.getPetSchedule = async function (req, res, next) {
         var updateNextFeed = await PetFeedServices.update(petNextFeed._id,updateNextFeed);
 
     }
-    var PetFeeds = await PetFeedServices.getTodayFeeds(PetSchedule._id);
-    if (PetFeeds == null) {
+
+
+    var PetFeeds1 = await PetFeedServices.getTodayFeeds(PetSchedule._id);
+    if (PetFeeds1 == null) {
         console.log("in PetFeed");
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
-    return res.status(200).send({ status: 'success', pet: Pet,pet_food_amount:PetFoodAmount,pet_schedule:PetSchedule, pet_feeds:PetFeeds, message:'Got pet schedule successfully!' });
+    return res.status(200).send({ status: 'success', pet: Pet,pet_food_amount:PetFoodAmount,pet_schedule:PetSchedule, pet_feeds:PetFeeds1, message:'Got pet schedule successfully!' });
 }
 exports.getPetHome = async function (req, res, next) {
     // console.log('In getAllCountries');
@@ -383,12 +385,12 @@ exports.getPetHome = async function (req, res, next) {
         var updateNextFeed = await PetFeedServices.update(petNextFeed._id,updateNextFeed);
 
     }
-    var PetFeeds = await PetFeedServices.getTodayFeeds(PetSchedule._id);
-    if (PetFeeds == null) {
+    var PetFeeds1 = await PetFeedServices.getTodayFeeds(PetSchedule._id);
+    if (PetFeeds1 == null) {
         console.log("in PetFeed");
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
-    return res.status(200).send({ status: 'success', user:existingUser, pet: Pet, pet_feeds:PetFeeds, pet_bowl_weight:PetBowlWeight, message:'Got pet home successfully!' });
+    return res.status(200).send({ status: 'success', user:existingUser, pet: Pet, pet_feeds:PetFeeds1, pet_bowl_weight:PetBowlWeight, message:'Got pet home successfully!' });
 }
 exports.getPetHistory = async function (req, res, next) {
     // console.log('In getAllCountries');
