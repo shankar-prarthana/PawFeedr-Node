@@ -322,20 +322,40 @@ exports.getPetHome = async function (req, res, next) {
         console.log("in PetSchedule");
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
-    var PetUpcoming = await PetFeedServices.getUpcoming(PetSchedule._id);
-    if (PetUpcoming == null) {
-        console.log("in PetUpcoming");
-    }
+
     var PetBowlWeight = await PetBowlWeightServices.getLastBowlWeightByPetId(Pet._id);
     if (PetBowlWeight == null) {
-        console.log("in PetUpcoming");
+        console.log("in PetBowlWeight");
     }
     var PetFeeds = await PetFeedServices.getTodayFeeds(PetSchedule._id);
     if (PetFeeds == null) {
         console.log("in PetFeed");
         return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
-    console.log("");
+    var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
+
+    for (i in PetFeeds.length){
+        if (PetFeeds[i].timings < now)
+        {
+            var newPetFeed = {
+                status: "expired",
+                operator_id: 'getPetHome',
+            };
+        
+           
+            var newPetFeed = await PetFeedServices.update(PetFeeds[i]._id,newPetFeed);
+           
+        }
+    } 
+    var petNextFeed = await PetFeedServices.getTodayFeedsNext(PetSchedule);
+    if (petNextFeed != null) {
+        var updateNextFeed = {
+            status: "upcoming",
+            operator_id: 'getPetHome',
+        };   
+        var updateNextFeed = await PetFeedServices.update(petNextFeed._id,updateNextFeed);
+
+    }
     return res.status(200).send({ status: 'success', user:existingUser, pet: Pet, pet_feeds:PetFeeds, pet_bowl_weight:PetBowlWeight, message:'Got pet home successfully!' });
 }
 exports.getPetHistory = async function (req, res, next) {
