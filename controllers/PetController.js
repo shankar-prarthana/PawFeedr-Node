@@ -290,8 +290,12 @@ exports.getPetSchedule = async function (req, res, next) {
     var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
 
     for (let i = 0; i < PetFeeds.length; i++){
-        if (PetFeeds[i].timing < now)
+        console.log("DEBUG 1"+PetFeeds[i].schedule_time);
+
+        if (PetFeeds[i].schedule_time < now)
         {
+            console.log("DEBUG 2"+PetFeeds[i].schedule_time);
+
             var newPetFeed = {
                 status: "expired",
                 operator_id: 'getPetSchedule',
@@ -364,7 +368,7 @@ exports.getPetHome = async function (req, res, next) {
     var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
 
     for (let i = 0; i < PetFeeds.length; i++){
-        if (PetFeeds[i].timing < now)
+        if (PetFeeds[i].schedule_time < now)
         {
             var newPetFeed = {
                 status: "expired",
