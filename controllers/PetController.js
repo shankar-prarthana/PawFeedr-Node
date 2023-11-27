@@ -289,7 +289,7 @@ exports.getPetSchedule = async function (req, res, next) {
     }
     var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
 
-    for (i in PetFeeds.length){
+    for (let i = 0; i < PetFeeds.length; i++){
         if (PetFeeds[i].timings < now)
         {
             var newPetFeed = {
@@ -363,7 +363,7 @@ exports.getPetHome = async function (req, res, next) {
     }
     var now = moment.parseZone(new Date()).utcOffset("+05:30")._d;
 
-    for (i in PetFeeds.length){
+    for (let i = 0; i < PetFeeds.length; i++){
         if (PetFeeds[i].timings < now)
         {
             var newPetFeed = {
