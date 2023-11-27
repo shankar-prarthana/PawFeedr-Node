@@ -311,6 +311,11 @@ exports.getPetSchedule = async function (req, res, next) {
         var updateNextFeed = await PetFeedServices.update(petNextFeed._id,updateNextFeed);
 
     }
+    var PetFeeds = await PetFeedServices.getTodayFeeds(PetSchedule._id);
+    if (PetFeeds == null) {
+        console.log("in PetFeed");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
+    }
     return res.status(200).send({ status: 'success', pet: Pet,pet_food_amount:PetFoodAmount,pet_schedule:PetSchedule, pet_feeds:PetFeeds, message:'Got pet schedule successfully!' });
 }
 exports.getPetHome = async function (req, res, next) {
@@ -377,6 +382,11 @@ exports.getPetHome = async function (req, res, next) {
         };   
         var updateNextFeed = await PetFeedServices.update(petNextFeed._id,updateNextFeed);
 
+    }
+    var PetFeeds = await PetFeedServices.getTodayFeeds(PetSchedule._id);
+    if (PetFeeds == null) {
+        console.log("in PetFeed");
+        return res.status(200).send({ status: 403, message: 'There seems to be an error at our end' });
     }
     return res.status(200).send({ status: 'success', user:existingUser, pet: Pet, pet_feeds:PetFeeds, pet_bowl_weight:PetBowlWeight, message:'Got pet home successfully!' });
 }
