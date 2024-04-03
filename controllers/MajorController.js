@@ -433,7 +433,7 @@ exports.getPatientImage = async function (req, res, next) {
     })
     .on('finish', () => {
         console.log('File downloaded successfully');
-        const imageUrl = `http://localhost:3000/assets/out/${name}`;
+        const imageUrl = `http://13.232.227.222:3000/assets/out/${name}`;
        // console.log(imageUrl);
         return res.status(200).send({ status: 'success', message:"Image retrieved successfully",image_url: imageUrl });
 
