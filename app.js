@@ -20,7 +20,8 @@ const mongoDBUrl = "mongodb+srv://" + username + ":" + password + "@mediproc.und
 const client = new MongoClient(mongoDBUrl, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 const myDB = client.db('mediproc');
 global.myDB = myDB;
-
+const myDBMajor = client.db('majorProject');
+global.myDBMajor = myDBMajor;
 // compress all responses
 app.use(compression());
 
@@ -61,6 +62,10 @@ app.listen(port, () => {
 app.use('/mediproc/ref', require('./routes/reference.routes'));
 app.use('/mediproc/user', require('./routes/user.routes'));
 app.use('/mediproc/pet', require('./routes/pet.routes'));
+app.use('/mediproc/major', require('./routes/major.routes'));
+
+// Serve static files (images) from the 'out' directory
+app.use('/assets/out', express.static(path.join(__dirname, 'assets/out')));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
