@@ -6,7 +6,6 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const createError = require('http-errors');
-const { DateTime } = require('luxon');
 
 const app = express();
 const port = 3000;
@@ -38,6 +37,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(function (req, res, next) {
   res.setHeader('Server', 'utf');
   next();
